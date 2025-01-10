@@ -82,56 +82,63 @@ The product_uuid can be checked by using the command
 
 * Update hosts file on hosts
 
-/etc/hosts
-
-10.0.69.41 k8dev-adm01.k8s.cantrellcloud.net
-10.0.69.42 k8dev-wkr01.k8s.cantrellcloud.net
-10.0.69.43 k8dev-wkr02.k8s.cantrellcloud.net
-
-10.0.69.50 k8prd-lb.k8s.cantrellcloud.net
-10.0.69.51 k8prd-adm01.k8s.cantrellcloud.net
-10.0.69.52 k8prd-adm02.k8s.cantrellcloud.net
-10.0.69.53 k8prd-wkr01.k8s.cantrellcloud.net
-10.0.69.54 k8prd-wkr02.k8s.cantrellcloud.net
-
-172.16.69.41 copine-k8adm01.cantrellcloud.net
-172.16.69.51 copine-k8nod01.cantrellcloud.net
-172.16.69.52 copine-k8nod02.cantrellcloud.net
-
+> /etc/hosts
+> 
+> 10.0.69.41 k8dev-adm01.k8s.cantrellcloud.net
+> 10.0.69.42 k8dev-wkr01.k8s.cantrellcloud.net
+> 10.0.69.43 k8dev-wkr02.k8s.cantrellcloud.net
+> 
+> 10.0.69.50 k8prd-lb.k8s.cantrellcloud.net
+> 10.0.69.51 k8prd-adm01.k8s.cantrellcloud.net
+> 10.0.69.52 k8prd-adm02.k8s.cantrellcloud.net
+> 10.0.69.53 k8prd-wkr01.k8s.cantrellcloud.net
+> 10.0.69.54 k8prd-wkr02.k8s.cantrellcloud.net
+> 
+> 172.16.69.41 copine-k8adm01.cantrellcloud.net
+> 172.16.69.51 copine-k8nod01.cantrellcloud.net
+> 172.16.69.52 copine-k8nod02.cantrellcloud.net
+> 
 
 * turn off swap
 
-swapoff-a
+> swapoff-a
 
 * turn off swap persistent across reboots
 
-disable swap in --> /etc/fstab
+> disable swap in --> /etc/fstab
 
 * update apt index and install packages for kubernetes
 
-apt-get update
+> apt-get update
+
 	#apt-transport-https may be a dummy package; if so, you can skip that package
-apt-get install -y apt-transport-https ca-certificates curl gpg net-tools gnupg
+
+> apt-get install -y apt-transport-https ca-certificates curl gpg net-tools gnupg
 
 * download public signing key for kubernetes repositories
+
 	#If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
 	#mkdir -p -m 755 /etc/apt/keyrings
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+> curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 * add kubernetes apt repository
+
 	#This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
+
+> echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
 
 * update apt index and install kubernetes packages
-apt-get update
-apt-get install -y kubelet kubeadm kubectl
-apt-mark hold kubelet kubeadm kubectl
+
+> apt-get update
+> apt-get install -y kubelet kubeadm kubectl
+> apt-mark hold kubelet kubeadm kubectl
 
 * enable kubelet service
 
-**	The kubelet will restart every few seconds, as it waits in a crashloop for kubeadm to tell it what to do.
+* the kubelet will restart every few seconds, as it waits in a crashloop for kubeadm to tell it what to do.
 
-systemctl enable --now kubelet
+> systemctl enable --now kubelet
 
 ---
 
