@@ -1,9 +1,8 @@
 # cocloud-k8s-dev-cluster-stitch
  COCloud K8s Development Cluster Stitch
 
-###############################################################################
-
-##IP Addresses
+---
+IP Addresses
 
 KUBEURNETES_EXTERNAL_ROUTED_VLANS
 255.255.255.0	subnetname	10.0.68.0/24		10.0.68.1 - 10.0.68.254			10.0.68.255
@@ -52,7 +51,7 @@ KUBEURNETES_INTERNAL_PRODUCTION_VLANS
 
 ## Deploy Kubernetes
 
-## Reference Sites
+### Reference Sites
 https://www.virtualizationhowto.com/2023/12/how-to-install-kubernetes-in-ubuntu-22-04-with-kubeadm/
 https://controlplane.com/community-blog/post/the-complete-kubectl-cheat-sheet
 https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
