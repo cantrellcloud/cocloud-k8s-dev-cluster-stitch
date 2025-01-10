@@ -71,7 +71,7 @@ download.docker.com/linux/ubuntu
 
 ---
 
-##System settings
+### System settings
 
 * Verify the MAC address and product_uuid are unique for every node
 
