@@ -1,0 +1,15 @@
+apiVersion: crd.projectcalico.org/v1
+kind: IPPool
+metadata:
+  name: ippool-vxlan-dev-external-subnets
+  namespace: dev-external
+spec:
+  allowedUses:
+    - Workload
+    - Tunnel
+  blockSize: 26
+  cidr: 192.168.68.0/24
+  ipipMode: Always
+  natOutgoing: true
+  nodeSelector: all()
+  vxlanMode: CrossSubnet

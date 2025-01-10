@@ -1,0 +1,49 @@
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: InitConfiguration
+bootstrapTokens:
+- token: "mz9koa.5vskbep6gh1ur86f"
+  description: "kubeadm bootstrap token"
+  ttl: "24h"
+- token: "kmjl7r.ykdbv0i70bskqgbe"
+  description: "another bootstrap token"
+  usages:
+  - authentication
+  - signing
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+nodeRegistration:
+  name: dev.node
+  criSocket: "unix:///var/run/containerd/containerd.sock"
+  taints: null
+  imagePullPolicy: "IfNotPresent"
+  imagePullSerial: true
+localAPIEndpoint:
+  advertiseAddress: "172.16.255.12"
+  bindPort: 6443
+timeouts:
+  controlPlaneComponentHealthCheck: "60s"
+---
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+etcd:
+  local:
+    imageRepository: "registry.k8s.io"
+    dataDir: "/var/lib/etcd"
+networking:
+  serviceSubnet: "10.0.212.0/24"
+  podSubnet: "172.16.212.0/24"
+  dnsDomain: "k8cluster.dev.local"
+controlPlaneEndpoint: "172.16.255.12:6443"
+apiServer: {}
+
+scheduler:
+  extraArgs:
+    - name: address
+      value: 172.16.255.12
+
+certificatesDir: "/etc/kubernetes/pki"
+imageRepository: "registry.k8s.io"
+clusterName: "development-cluster"
+encryptionAlgorithm: ECDSA-P256
+dns: {}
+proxy: {}
