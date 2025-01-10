@@ -76,8 +76,9 @@ download.docker.com/linux/ubuntu
 * Verify the MAC address and product_uuid are unique for every node
 
 You can get the MAC address of the network interfaces using the command ip link or ifconfig -a
-The product_uuid can be checked by using the command cat /sys/class/dmi/id/product_uuid
+The product_uuid can be checked by using the command
 
+ cat /sys/class/dmi/id/product_uuid
 
 * Update hosts file on hosts
 
@@ -98,39 +99,45 @@ The product_uuid can be checked by using the command cat /sys/class/dmi/id/produ
 172.16.69.52 copine-k8nod02.cantrellcloud.net
 
 
-*turn off swap
+* turn off swap
+
 swapoff-a
 
-*turn off swap persistent across reboots
+* turn off swap persistent across reboots
+
 disable swap in --> /etc/fstab
 
-*update apt index and install packages for kubernetes
+* update apt index and install packages for kubernetes
+
 apt-get update
 	#apt-transport-https may be a dummy package; if so, you can skip that package
 apt-get install -y apt-transport-https ca-certificates curl gpg net-tools gnupg
 
-*download public signing key for kubernetes repositories
+* download public signing key for kubernetes repositories
 	#If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
 	#mkdir -p -m 755 /etc/apt/keyrings
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-*add kubernetes apt repository
+* add kubernetes apt repository
 	#This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
 
-*update apt index and install kubernetes packages
+* update apt index and install kubernetes packages
 apt-get update
 apt-get install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 
-*enable kubelet service
-	#The kubelet will restart every few seconds, as it waits in a crashloop for kubeadm to tell it what to do.
+* enable kubelet service
+
+**	The kubelet will restart every few seconds, as it waits in a crashloop for kubeadm to tell it what to do.
+
 systemctl enable --now kubelet
 
+---
 
-##Update firewall rules
+### Update firewall rules
 
-*enable firewall
+* enable firewall
 ufw enable
 
 *Control Plane rules
