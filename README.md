@@ -74,10 +74,13 @@ download.docker.com/linux/ubuntu
 ##System settings
 
 * Verify the MAC address and product_uuid are unique for every node
+
 You can get the MAC address of the network interfaces using the command ip link or ifconfig -a
 The product_uuid can be checked by using the command cat /sys/class/dmi/id/product_uuid
 
+
 * Update hosts file on hosts
+
 /etc/hosts
 
 10.0.69.41 k8dev-adm01.k8s.cantrellcloud.net
