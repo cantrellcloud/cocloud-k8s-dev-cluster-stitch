@@ -2,7 +2,9 @@
  COCloud K8s Development Cluster Stitch
 
 ---
-IP Addresses
+
+
+## IP Addresses
 
 KUBEURNETES_EXTERNAL_ROUTED_VLANS
 255.255.255.0	subnetname	10.0.68.0/24		10.0.68.1 - 10.0.68.254			10.0.68.255
@@ -48,6 +50,7 @@ KUBEURNETES_INTERNAL_PRODUCTION_VLANS
 255.255.255.224	namespace	172.16.69.192/27	172.16.69.193 - 172.16.69.222	172.16.69.223
 255.255.255.224	namespace	172.16.69.224/27	172.16.69.225 - 172.16.69.254	172.16.69.255
 
+---
 
 ## Deploy Kubernetes
 
@@ -57,7 +60,7 @@ https://controlplane.com/community-blog/post/the-complete-kubectl-cheat-sheet
 https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
 https://docs.tigera.io/calico/latest/operations/calicoctl/install#install-calicoctl-as-a-kubectl-plugin-on-a-single-host
 
-## Repositories
+### Repositories
 raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
 raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml
 github.com/projectcalico/calico/releases/download/v3.29.1/calicoctl-linux-amd64
@@ -66,14 +69,15 @@ pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
 download.docker.com/linux/ubuntu/gpg
 download.docker.com/linux/ubuntu
 
+---
 
 ##System settings
 
-*Verify the MAC address and product_uuid are unique for every node
+* Verify the MAC address and product_uuid are unique for every node
 You can get the MAC address of the network interfaces using the command ip link or ifconfig -a
 The product_uuid can be checked by using the command cat /sys/class/dmi/id/product_uuid
 
-*Update hosts file on hosts
+* Update hosts file on hosts
 /etc/hosts
 
 10.0.69.41 k8dev-adm01.k8s.cantrellcloud.net
