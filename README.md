@@ -143,7 +143,7 @@ KUBEURNETES_INTERNAL_PRODUCTION_VLANS
 
 ## Deploy Kubernetes
 
-### Reference Sites
+### References and Notes
 
 https://www.virtualizationhowto.com/2023/12/how-to-install-kubernetes-in-ubuntu-22-04-with-kubeadm/
 
