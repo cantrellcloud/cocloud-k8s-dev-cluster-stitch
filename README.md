@@ -1,9 +1,10 @@
 # cocloud-k8s-dev-cluster-stitch
  COCloud K8s Development Cluster Stitch
 
-> Cantrell Cloud Enterprise Services
->	designed by: Ron Cantrell ron@cantrelloffice.cloud
->
+Cantrell Cloud Enterprise Services
+designed by:
+	Ron Cantrell
+	ron@cantrelloffice.cloud
 
 ---
 
