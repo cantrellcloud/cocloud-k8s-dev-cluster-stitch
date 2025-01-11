@@ -224,6 +224,14 @@ kubectl get configmaps
 
 Secrets
 
+- Secrets are not encrypted. They are **encoded**.
+  - Do not check-in Secret objects to SCM (Github) along with code
+- Secrets are not encrypted in ETCD
+  - Enable encryption at rest
+- Anyone able to create pods/de in the name namespace can acces the secrets
+  - Configure RBAC
+  - Consider third-party Secret provider
+
 ```
 apiVersion: v1
 kind: Secret
