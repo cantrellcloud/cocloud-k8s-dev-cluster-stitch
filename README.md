@@ -154,11 +154,9 @@ apt-mark hold kubelet kubeadm kubectl
 
 `systemctl enable --now kubelet`
 
----
+11. Update firewall rules
 
-## Update firewall rules
-
-1. enable firewall and add rules
+- enable firewall and add rules
 
 `ufw enable`
 
@@ -204,9 +202,11 @@ alias kl='kubectl logs'
 alias kgall='kubectl get all -A'
 ```
 
-source ~/.bash_aliases
+`source ~/.bash_aliases`
 
-*kernel parameters for containerD
+- kernel parameters for containerD
+
+```
 tee /etc/modules-load.d/containerd.conf <<EOF
 overlay
 br_netfilter
@@ -221,15 +221,14 @@ net.ipv4.ip_forward = 1
 EOT
 
 sysctl --system
+```
 
+12. Installing Containerd container runtime
 
-##Installing Containerd container runtime
+- setup Docker’s apt repository
 
-*setup Docker’s apt repository
 apt update
-	#not needed: install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-	#may not need this: chmod a+r /etc/apt/keyrings/docker.gpg
 
 *Add the repository to Apt sources:
 deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable
