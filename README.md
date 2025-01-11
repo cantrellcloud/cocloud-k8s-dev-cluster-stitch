@@ -5,7 +5,8 @@
 
 # IP Addresses
 
-`KUBEURNETES_EXTERNAL_ROUTED_VLANS`
+```
+KUBEURNETES_EXTERNAL_ROUTED_VLANS
 255.255.255.0	subnetname	10.0.68.0/24		10.0.68.1 - 10.0.68.254			10.0.68.255
 255.255.255.224	namespace	10.0.68.0/27		10.0.68.1 - 10.0.68.30			10.0.68.31
 255.255.255.224	namespace	10.0.68.32/27		10.068.33 - 10.0.68.62			10.0.68.63
@@ -48,6 +49,7 @@ KUBEURNETES_INTERNAL_PRODUCTION_VLANS
 255.255.255.224	namespace	172.16.69.160/27	172.16.69.161 - 172.16.69.190	172.16.69.191
 255.255.255.224	namespace	172.16.69.192/27	172.16.69.193 - 172.16.69.222	172.16.69.223
 255.255.255.224	namespace	172.16.69.224/27	172.16.69.225 - 172.16.69.254	172.16.69.255`
+```
 
 ---
 
@@ -61,6 +63,7 @@ https://docs.tigera.io/calico/latest/operations/calicoctl/install#install-calico
 
 ## Repositories
 
+```
 raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
 raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml
 github.com/projectcalico/calico/releases/download/v3.29.1/calicoctl-linux-amd64
@@ -68,7 +71,7 @@ downloads.tigera.io/ee/binaries/v3.19.4/calicoctl
 pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
 download.docker.com/linux/ubuntu/gpg
 download.docker.com/linux/ubuntu
-
+```
 
 ---
 
@@ -79,11 +82,12 @@ download.docker.com/linux/ubuntu
 You can get the MAC address of the network interfaces using the command ip link or ifconfig -a
 The product_uuid can be checked by using the command
 
- cat /sys/class/dmi/id/product_uuid
+`cat /sys/class/dmi/id/product_uuid`
 
 
 * Update hosts file on hosts
 
+```
 /etc/hosts
 
 10.0.69.41 k8dev-adm01.k8s.cantrellcloud.net
@@ -99,42 +103,37 @@ The product_uuid can be checked by using the command
 172.16.69.41 copine-k8adm01.cantrellcloud.net
 172.16.69.51 copine-k8nod01.cantrellcloud.net
 172.16.69.52 copine-k8nod02.cantrellcloud.net
-
+```
 
 * turn off swap
 
-swapoff-a
-
+`swapoff-a`
 
 * turn off swap persistent across reboots
 
-disable swap in --/etc/fstab
-
+`disable swap in --/etc/fstab`
 
 * update apt index and install packages for kubernetes
 
-apt-get update
+`apt-get update`
 
+* apt-transport-https may be a dummy package; if so, you can skip that package
 
-	apt-transport-https may be a dummy package; if so, you can skip that package
-
-apt-get install -y apt-transport-https ca-certificates curl gpg net-tools gnupg
-
+`apt-get install -y apt-transport-https ca-certificates curl gpg net-tools gnupg`
 
 * download public signing key for kubernetes repositories
 
-	#If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
-	#mkdir -p -m 755 /etc/apt/keyrings
+* If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
 
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+> mkdir -p -m 755 /etc/apt/keyrings
 
+`curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg`
 
 * add kubernetes apt repository
 
-	#This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
+* This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
 
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
-
+`echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list`
 
 * update apt index and install kubernetes packages
 
