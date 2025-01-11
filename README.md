@@ -1,6 +1,9 @@
 # cocloud-k8s-dev-cluster-stitch
  COCloud K8s Development Cluster Stitch
 
+Cantrell Cloud Enterprise Services
+	designed by: Ron Cantrell ron@cantrelloffice.cloud
+
 ---
 
 ## Table of Contents
@@ -14,6 +17,8 @@ You then need to join any other node using the generated key and label.
 
 Following the instructions given, you should be able to configure and initialize a default
 Kubernetes cluster with NSX networking overlays.
+
+This deployment has been tested on Ubuntu Server 24.04.1
 
 ### This is the desired end state for the Enterprise
 
