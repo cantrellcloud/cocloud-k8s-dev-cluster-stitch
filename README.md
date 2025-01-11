@@ -188,6 +188,72 @@ kubectl rollout history deployment/my-deployment
 kubectl rollout undo deployment/my-deployment
 ```
 
+- configure applications
+
+application commands
+
+```
+docker run ubuntu
+docker build -t ubuntu-sleeper .
+docker run ubuntu-sleeper
+
+```
+
+- Configuring ConfigMaps
+
+```
+kubectl create configmap \
+	app-config --from-literal=APP_COLOR=blue
+```
+
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+	name: app-config
+data:
+	APP_COLOR: blue
+	APP_MODE: prod
+```
+
+`kubectl get configmaps`
+
+- secrets
+
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+data:
+  DB_Host: mysql
+  DB_User: root
+  DB_Password: paswrd
+```
+
+```
+echo -n 'mysql'  | base64
+echo -n 'root'   | base64
+echo -n 'paswrd' | base64
+```
+
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+data:
+  DB_Host: bXlzcWw=
+  DB_User: cm9vdA==
+  DB_Password: cGFzd3Jk
+```
+
+-- add this to pod definition files
+
+> envFrom:
+> - secretRef:
+>   name: app-secret
+>
 
 ### Repositories
 
