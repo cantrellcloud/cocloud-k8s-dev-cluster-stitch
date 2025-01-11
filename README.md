@@ -157,7 +157,7 @@ https://kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/
 
 https://tamerlan.dev/load-balancing-in-kubernetes-a-step-by-step-guide/
 
-- scheduling
+Scheduling
 
 https://github.com/kubernetes/community/blob/master/contributors/devel/sig-scheduling/scheduling_code_hierarchy_overview.md
 
@@ -167,7 +167,7 @@ https://jvns.ca/blog/2017/07/27/how-does-the-kubernetes-scheduler-work/
 
 https://stackoverflow.com/questions/28857993/how-does-kubernetes-scheduler-work
 
-- monitoring
+Monitoring
 
 `kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml`
 
@@ -175,11 +175,11 @@ https://stackoverflow.com/questions/28857993/how-does-kubernetes-scheduler-work
 kubectl top pod
 ```
 
-- logging
+Logging
 
 `kubectl logs -f pod-name-here container-name-here`
 
-- rollout status
+Rollouts
 
 ```
 kubectl rollout status deployment/my-deployment
@@ -188,9 +188,7 @@ kubectl rollout history deployment/my-deployment
 kubectl rollout undo deployment/my-deployment
 ```
 
-- configure applications
-
-application commands
+Configuring Applications
 
 ```
 docker run ubuntu
@@ -199,7 +197,7 @@ docker run ubuntu-sleeper
 
 ```
 
-- Configuring ConfigMaps
+ConfigMaps
 
 ```
 kubectl create configmap \
@@ -218,7 +216,7 @@ data:
 
 `kubectl get configmaps`
 
-- secrets
+Secrets
 
 ```
 apiVersion: v1
@@ -248,7 +246,7 @@ data:
   DB_Password: cGFzd3Jk
 ```
 
-add this to pod definition files
+Add to pod definition files
 
 
 ```
