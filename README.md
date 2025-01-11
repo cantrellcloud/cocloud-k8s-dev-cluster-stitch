@@ -4,7 +4,7 @@
 ---
 
 ## Table of Contents
-- [IP Addresses] (#ipaddresses)
+- [IP Addresses](#ipaddresses)
 - [System Settings](#systemsettings)
 
 ---
