@@ -159,13 +159,13 @@ https://tamerlan.dev/load-balancing-in-kubernetes-a-step-by-step-guide/
 
 - scheduling
 
-	https://github.com/kubernetes/community/blob/master/contributors/devel/sig-scheduling/scheduling_code_hierarchy_overview.md
+https://github.com/kubernetes/community/blob/master/contributors/devel/sig-scheduling/scheduling_code_hierarchy_overview.md
 
-	https://kubernetes.io/blog/2017/03/advanced-scheduling-in-kubernetes/
+https://kubernetes.io/blog/2017/03/advanced-scheduling-in-kubernetes/
 
-	https://jvns.ca/blog/2017/07/27/how-does-the-kubernetes-scheduler-work/
+https://jvns.ca/blog/2017/07/27/how-does-the-kubernetes-scheduler-work/
 
-	https://stackoverflow.com/questions/28857993/how-does-kubernetes-scheduler-work
+https://stackoverflow.com/questions/28857993/how-does-kubernetes-scheduler-work
 
 - monitoring
 
@@ -177,7 +177,17 @@ kubectl top pod
 
 - logging
 
-`kubectl logs -f pod-name-here`
+`kubectl logs -f pod-name-here container-name-here`
+
+- rollout status
+
+```
+kubectl rollout status deployment/my-deployment
+kubectl rollout history deployment/my-deployment
+
+kubectl rollout undo deployment/my-deployment
+```
+
 
 ### Repositories
 
