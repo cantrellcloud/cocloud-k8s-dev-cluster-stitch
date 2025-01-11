@@ -146,11 +146,38 @@ KUBEURNETES_INTERNAL_PRODUCTION_VLANS
 ### Reference Sites
 
 https://www.virtualizationhowto.com/2023/12/how-to-install-kubernetes-in-ubuntu-22-04-with-kubeadm/
+
 https://controlplane.com/community-blog/post/the-complete-kubectl-cheat-sheet
+
 https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
+
 https://docs.tigera.io/calico/latest/operations/calicoctl/install#install-calicoctl-as-a-kubectl-plugin-on-a-single-host
+
 https://kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/
+
 https://tamerlan.dev/load-balancing-in-kubernetes-a-step-by-step-guide/
+
+- scheduling
+
+	https://github.com/kubernetes/community/blob/master/contributors/devel/sig-scheduling/scheduling_code_hierarchy_overview.md
+
+	https://kubernetes.io/blog/2017/03/advanced-scheduling-in-kubernetes/
+
+	https://jvns.ca/blog/2017/07/27/how-does-the-kubernetes-scheduler-work/
+
+	https://stackoverflow.com/questions/28857993/how-does-kubernetes-scheduler-work
+
+- monitoring
+
+`kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml`
+
+```kubectl top node
+kubectl top pod
+```
+
+- logging
+
+`kubectl logs -f pod-name-here`
 
 ### Repositories
 
@@ -288,6 +315,8 @@ alias ka='kubectl apply'
 alias kdelf='kubectl delete -f'
 alias kl='kubectl logs'
 alias kgall='kubectl get all -A'
+alias ktn='kubectl top node'
+alias ktp='kubectl top pod'
 
 source ~/.bash_aliases
 ```
