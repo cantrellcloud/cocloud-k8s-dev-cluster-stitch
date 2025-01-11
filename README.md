@@ -7,7 +7,48 @@
 
 ---
 
-# IP Addresses
+## Introduction
+
+Following the instructions given, you should be able to configure and initialize a default
+Kubernetes cluster with NSX networking overlays
+
+### This is the desired end state
+
+```
++===============================================================================================+
+|                                                                                               |
+|  +-----------------------------------------------------------------------------------------+  |
+|  | INGRESS (kube-vip)                                                                      |  |
+|  |                                                                                         |  |
+|  |     +----------------+             +----------------+            +-----------------+    |  |
+|  |     | foo.domain.tld |             | www.domain.ltd |            | app1.domain.ltd |    |  |
+|  |     +----------------+             +----------------+            +-----------------+    |  |
+|  |             |                              |                              |             |  |
+|  +-----------------------------------------------------------------------------------------+  |
+|                |                              |                              |                |
+|                |                              |                              |                |
+|  +---------------------------+  +---------------------------+  +---------------------------+  |
+|  |             |             |  |             |             |  |             |             |  |
+|  |  +---------------------+  |  |  +---------------------+  |  |	+---------------------+  |  |
+|  |  | SERVICE (ClusterIP) +  |  |  | SERVICE (ClusterIP) |  |  |	| SERVICE (ClusterIP) |  |  |
+|  |  +---------------------+  |  |  +---------------------+  |  |	+---------------------+  |  |
+|  |     |       |       |     |  |     |       |       |     |  |     |       |       |     |  |
+|  |     |       |       |     |  |     |       |       |     |  |     |       |       |     |  |
+|  |     \       |       /     |  |     \       |       /     |  |     \       |       /     |  |
+|  |  +-----+ +-----+ +-----+  |  |  +-----+ +-----+ +-----+  |  |	+-----+	+-----+	+-----+  |  |
+|  |  | POD | | POD | | POD |  |  |  | POD | | POD | | POD |  |  |	| POD |	| POD |	| POD |  |  |
+|  |  +-----+ +-----+ +-----+  |  |  +-----+ +-----+ +-----+  |  |	+-----+	+-----+ +-----+  |  |
+|  |                           |  |                           |  |                           |  |
+|  | WORKER NODE               |  | WORKER NODE               |  | WORKER NODE               |  |
+|  +---------------------------+  +---------------------------+  +---------------------------+  |
+|                                                                                               |
+| KUBERNETES CLUSTER                                                                            |
++===============================================================================================+
+```
+
+### Reserved Cluster IP Address Blocks
+
+- example of ip networks and subnets
 
 ```
 KUBEURNETES_EXTERNAL_ROUTED_VLANS
@@ -55,19 +96,50 @@ KUBEURNETES_INTERNAL_PRODUCTION_VLANS
 255.255.255.224	namespace	172.16.69.224/27	172.16.69.225 - 172.16.69.254	172.16.69.255`
 ```
 
+- COCloud networks and subnets
+
+```
+255.255.254.0	COPINE K8 Cluster - serviceSubnets	10.0.212.0/23		10.0.212.1 - 10.0.213.254		10.0.213.255
+255.255.255.0		cluster serviceSubnets				10.0.212.0/24		10.0.212.1 - 10.0.212.254		10.0.212.255
+255.255.255.192			cluster 01 dev						10.0.212.0/26		10.0.212.1 - 10.0.212.62		10.0.212.63
+255.255.255.192			cluster 02							10.0.212.64/26		10.0.212.65 - 10.0.212.126		10.0.212.127
+255.255.255.192			cluster 03							10.0.212.128/26		10.0.212.129 - 10.0.212.190		10.0.212.191
+255.255.255.192			cluster 04							10.0.212.192/26		10.0.212.193 - 10.0.212.254		10.0.212.255
+255.255.255.0		cluster serviceSubnet				10.0.213.0/24		10.0.213.1 - 10.0.213.254		10.0.213.255
+255.255.255.192			cluster 05							10.0.213.0/26		10.0.213.1 - 10.0.213.62		10.0.213.63
+255.255.255.192			cluster 06							10.0.213.64/26		10.0.213.65 - 10.0.213.126		10.0.213.127
+255.255.255.192			cluster 07							10.0.213.128/26		10.0.213.129 - 10.0.213.190		10.0.213.191
+255.255.255.192			cluster 08							10.0.213.192/26		10.0.213.193 - 10.0.213.254		10.0.213.255
+255.255.254.0	COPINE K8 Cluster01 - podSubnets	172.16.212.0/23		172.16.212.1 - 172.16.213.254	172.16.213.255
+255.255.255.0		cluster podSubnets					172.16.212.0/24		172.16.212.1 - 172.16.212.254	172.16.212.255
+255.255.255.192			cluster 01 dev						172.16.212.0/26		172.16.212.1 - 172.16.212.62	172.16.212.63
+255.255.255.248			namespace 01 - pihole				172.16.212.0/29		172.16.212.1 - 172.16.212.6		172.16.212.7
+							copine-pihole01		172.16.212.1	
+							copine-pihole02		172.16.212.2	
+255.255.255.192			cluster 02							172.16.212.64/26	172.16.212.65 - 172.16.212.126	172.16.212.127
+255.255.255.192			cluster 03							172.16.212.128/26	172.16.212.129 - 172.16.212.190	172.16.212.191
+255.255.255.192			cluster 04							172.16.212.192/26	172.16.212.193 - 172.16.212.254	172.16.212.255
+255.255.255.0		podSubnet							172.16.213.0/24		172.16.213.1 - 172.16.213.254	172.16.213.255
+255.255.255.192			cluster 05							172.16.213.0/26		172.16.213.1 - 172.16.213.62	172.16.213.63
+255.255.255.192			cluster 06							172.16.213.64/26	172.16.213.65 - 172.16.213.126	172.16.213.127
+255.255.255.192			cluster 07							172.16.213.128/26	172.16.213.129 - 172.16.213.190	172.16.213.191
+255.255.255.192			cluster 08							172.16.213.192/26	172.16.213.193 - 172.16.213.254	172.16.213.255
+```
+
 ---
 
-# Deploy Kubernetes
+## Deploy Kubernetes
 
-## Reference Sites
+### Reference Sites
 
 https://www.virtualizationhowto.com/2023/12/how-to-install-kubernetes-in-ubuntu-22-04-with-kubeadm/
 https://controlplane.com/community-blog/post/the-complete-kubectl-cheat-sheet
 https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
 https://docs.tigera.io/calico/latest/operations/calicoctl/install#install-calicoctl-as-a-kubectl-plugin-on-a-single-host
 https://kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/
+https://tamerlan.dev/load-balancing-in-kubernetes-a-step-by-step-guide/
 
-## Repositories
+### Repositories
 
 ```
 raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
@@ -81,7 +153,7 @@ download.docker.com/linux/ubuntu
 
 ---
 
-## System settings
+### Kubernetes cluster system configuation and initialization
 
 1. Verify the MAC address and product_uuid are unique for every node
 
@@ -187,9 +259,13 @@ ufw allow 30000:32767/tcp
 
 `ufw status verbose`
 
-- command alias
+11. add command line aliases for frequently used commands
+
+- edit command alias file
 
 `vi ~/.bash_aliases`
+
+- add aliases and make active
 
 ```
 alias k=kubectl
@@ -203,7 +279,7 @@ alias kgall='kubectl get all -A'
 source ~/.bash_aliases
 ```
 
-- kernel parameters for containerD
+12. kernel parameters for containerD
 
 ```
 tee /etc/modules-load.d/containerd.conf <<EOF
@@ -222,7 +298,7 @@ EOT
 sysctl --system
 ```
 
-11. Installing Containerd container runtime
+13. Installing Containerd container runtime
 
 - setup Docker’s apt repository
 
@@ -270,7 +346,7 @@ systemctl enable containerd
 systemctl status containerd
 ```
 
-12. Pull kubeadm config images and initialize default configuration
+14. Pull kubeadm config images and initialize default configuration
 
 - pull kubeadm default config
 
@@ -292,358 +368,110 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-##Modify the kubelet ConfigMap
-	#Should be set, run command to verify cgroupDriver: systemd
-kubectl edit cm kubelet-config -n kube-system
+15. Modify the kubelet ConfigMap
 
+- Should be set, run command to verify cgroupDriver: systemd
 
-##Install Calico
+`kubectl edit cm kubelet-config -n kube-system`
+
+16. Install Calico network overlay
+
+```
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
 curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml -O
 kubectl create -f custom-resources.yaml
+```
 
-- initialize calico network overlay
-kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+- initialize overlay
 
-- may take a few minutes for all nodes in the cluster to spin up all the networking nodes and report ready
-watch kubectl get pods -n calico-system
+`kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml`
 
-	#Worker nodes may be added at this time
-
-- Configure BGP
-	#If planning to use NSX network overlay, BGP is not needed
+- may take a few minutes for all nodes in the cluster to spin up all the networking nodes and **report ready**
+	- you can watch by entering the following command
+	
+	`watch kubectl get pods -n calico-system`
 
 - Configure NSX overlay
-apiVersion: crd.projectcalico.org/v1
-kind: IPPool
-metadata:
-  name: ippool-vxlan-dev-internal-subnets
-  namespace: dev-internal
-spec:
-  allowedUses:
-    - Workload
-    - Tunnel
-  blockSize: 26
-  cidr: 192.168.69.0/24
-  ipipMode: Always
-  natOutgoing: true
-  nodeSelector: all()
-  vxlanMode: CrossSubnet
+	- it is best practice to use manifest (yaml) files which will be added in a future release
+	- for now, create config.yaml files for each of the following IPPools to enable NSX overlay
 
+	```
+	apiVersion: crd.projectcalico.org/v1
+	kind: IPPool
+	metadata:
+	  name: ippool-vxlan-dev-internal-subnets
+	  namespace: dev-internal
+	spec:
+	  allowedUses:
+		- Workload
+		- Tunnel
+	  blockSize: 26
+	  cidr: 192.168.69.0/24
+	  ipipMode: Always
+	  natOutgoing: true
+	  nodeSelector: all()
+	  vxlanMode: CrossSubnet
+	```
 
-apiVersion: crd.projectcalico.org/v1
-kind: IPPool
-metadata:
-  name: ippool-vxlan-dev-external-subnets
-  namespace: dev-external
-spec:
-  allowedUses:
-    - Workload
-    - Tunnel
-  blockSize: 26
-  cidr: 192.168.68.0/24
-  ipipMode: Always
-  natOutgoing: true
-  nodeSelector: all()
-  vxlanMode: CrossSubnet
+	```
+	apiVersion: crd.projectcalico.org/v1
+	kind: IPPool
+	metadata:
+	  name: ippool-vxlan-dev-external-subnets
+	  namespace: dev-external
+	spec:
+	  allowedUses:
+		- Workload
+		- Tunnel
+	  blockSize: 26
+	  cidr: 192.168.68.0/24
+	  ipipMode: Always
+	  natOutgoing: true
+	  nodeSelector: all()
+	  vxlanMode: CrossSubnet
+	```
 
-- take snapshot 2
+- if building an image, this is a good point to take snapshot 2
 
+17. Verify Kubernetes is running
 
+`kubectl get nodes`
 
-## Join nodes to cluster
-	#To view the join token:
-- kubeadm token create --print-join-command
+18. Add additional nodes to cluster and labels, taints, and tolerances
 
-- on each worker node
+- To join nodes, you must fist have a key
+- Copy/paste the displayed command to other nodes that are ready to be added to the cluster
+
+`kubeadm token create --print-join-command`
+
+- on each worker node as a regular user
+
+```
 mkdir -p $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown $(id -u):$(id -g) $HOME/.kube/config
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
 
 - label nodes
-kubectl label node nodename key=value
 
-## Manifests
-
-- create continuous running ubuntu server for cluster maintenance
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: dev-kubeadmin
-  namespace: dev-internal
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: dev-kubeadmin
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        app: dev-kubeadmin
-    spec:
-      containers:
-        - name: dev-kubeadmin
-          image: ubuntu:xenial
-          ports:
-            - containerPort: 2269
-          command:
-            - /bin/sh
-            - '-c'
-            - tail -f /dev/null
-			- ["printenv"]
-		  args: ["HOSTNAME", "KUBERNETES_PORT"]
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          imagePullPolicy: IfNotPresent
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
-
-- create test application
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: devapp01
-  namespace: dev-internal
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: devapp01
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        app: devapp01
-    spec:
-      containers:
-        - name: devapp01
-          image: ubuntu:xenial
-          ports:
-            - containerPort: 2201
-          command: ["printenv"]
-          args: ["HOSTNAME", "KUBERNETES_PORT"]
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          imagePullPolicy: IfNotPresent
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
-
+`kubectl label node nodename key=value`
 
 - to bash into a pod
-k exec --stdin --tty dev-intdmz-linux-test-65bf85b85d-lnnhw --namespace=dev-external -- /bin/bash
 
+`k exec --stdin --tty dev-intdmz-linux-test-65bf85b85d-lnnhw --namespace=dev-external -- /bin/bash`
 
-###############################################################################
-##
-## Load Balancing
-##
-##https://tamerlan.dev/load-balancing-in-kubernetes-a-step-by-step-guide/
-##
-##
+---
 
-- this is the preferred deployment model
+# COCloud Applications
 
-kube-vip-cloud-provider
-
-+===============================================================================================+
-|                                                                                               |
-|  +-----------------------------------------------------------------------------------------+  |
-|  | INGRESS (kube-vip)                                                                      |  |
-|  |                                                                                         |  |
-|  |     +----------------+             +----------------+            +-----------------+    |  |
-|  |     | foo.domain.tld |             | www.domain.ltd |            | app1.domain.ltd |    |  |
-|  |     +----------------+             +----------------+            +-----------------+    |  |
-|  |             |                              |                              |             |  |
-|  +-----------------------------------------------------------------------------------------+  |
-|                |                              |                              |                |
-|                |                              |                              |                |
-|  +---------------------------+  +---------------------------+  +---------------------------+  |
-|  |             |             |  |             |             |  |             |             |  |
-|  |  +---------------------+  |  |  +---------------------+  |  |	+---------------------+  |  |
-|  |  | SERVICE (ClusterIP) +  |  |  | SERVICE (ClusterIP) |  |  |	| SERVICE (ClusterIP) |  |  |
-|  |  +---------------------+  |  |  +---------------------+  |  |	+---------------------+  |  |
-|  |     |       |       |     |  |     |       |       |     |  |     |       |       |     |  |
-|  |     |       |       |     |  |     |       |       |     |  |     |       |       |     |  |
-|  |     \       |       /     |  |     \       |       /     |  |     \       |       /     |  |
-|  |  +-----+ +-----+ +-----+  |  |  +-----+ +-----+ +-----+  |  |	+-----+	+-----+	+-----+  |  |
-|  |  | POD | | POD | | POD |  |  |  | POD | | POD | | POD |  |  |	| POD |	| POD |	| POD |  |  |
-|  |  +-----+ +-----+ +-----+  |  |  +-----+ +-----+ +-----+  |  |	+-----+	+-----+ +-----+  |  |
-|  |                           |  |                           |  |                           |  |
-|  | WORKER NODE               |  | WORKER NODE               |  | WORKER NODE               |  |
-|  +---------------------------+  +---------------------------+  +---------------------------+  |
-|                                                                                               |
-| KUBERNETES CLUSTER                                                                            |
-+===============================================================================================+
-
-##Create: NameSpaceVIPs, IP-Pools, Ingress, ClusterIPs, and Services
-
-- kube-vip-cloud-provider
-- A service will take an address based upon its namespace pool cidr/range-namespace
-
-$ kubectl get configmap -n <$NAMESPACEkubevip -o yaml
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: dns-vip
-  namespace: dns-pihole
-data:
-  cidr-default: 172.16.212.0/29
-  cidr-copine-pihole01: 172.16.212.1/32
-  cidr-copine-pihole02: 172.16.212.2/32
-  cidr-<$APP99>: xxx.xxx.xxx.xxx/xx
-  cidr-ipv6: xxxx::xx/xxx  #do not use IPv6 until deployed onto Production cluster
-
-- create IP-Pools
-Create an IP pool using a CIDR
-kubectl create configmap --namespace kube-system kubevip --from-literal cidr-global=192.168.0.220/29
-
-kubectl create configmap --namespace dns-pihole dns-pihole --from-literal cidr-global=172.16.212.0/29
-
-255.255.254.0	COPINE K8 Cluster - serviceSubnets	10.0.212.0/23	10.0.212.1 - 10.0.213.254	10.0.213.255
-255.255.255.0	cluster serviceSubnets				10.0.212.0/24	10.0.212.1 - 10.0.212.254	10.0.212.255
-255.255.255.192	cluster 01 dev						10.0.212.0/26	10.0.212.1 - 10.0.212.62	10.0.212.63
-255.255.255.192	cluster 02							10.0.212.64/26	10.0.212.65 - 10.0.212.126	10.0.212.127
-255.255.255.192	cluster 03							10.0.212.128/26	10.0.212.129 - 10.0.212.190	10.0.212.191
-255.255.255.192	cluster 04							10.0.212.192/26	10.0.212.193 - 10.0.212.254	10.0.212.255
-255.255.255.0	cluster serviceSubnet				10.0.213.0/24	10.0.213.1 - 10.0.213.254	10.0.213.255
-255.255.255.192	cluster 05							10.0.213.0/26	10.0.213.1 - 10.0.213.62	10.0.213.63
-255.255.255.192	cluster 06							10.0.213.64/26	10.0.213.65 - 10.0.213.126	10.0.213.127
-255.255.255.192	cluster 07							10.0.213.128/26	10.0.213.129 - 10.0.213.190	10.0.213.191
-255.255.255.192	cluster 08							10.0.213.192/26	10.0.213.193 - 10.0.213.254	10.0.213.255
-255.255.254.0	COPINE K8 Cluster01 - podSubnets	172.16.212.0/23	172.16.212.1 - 172.16.213.254	172.16.213.255
-255.255.255.0	cluster podSubnets					172.16.212.0/24	172.16.212.1 - 172.16.212.254	172.16.212.255
-255.255.255.192	cluster 01 dev						172.16.212.0/26	172.16.212.1 - 172.16.212.62	172.16.212.63
-255.255.255.248	namespace 01 - pihole				172.16.212.0/29	172.16.212.1 - 172.16.212.6	172.16.212.7
-				copine-pihole01		172.16.212.1	
-				copine-pihole02		172.16.212.2	
-				
-255.255.255.192	cluster 02	172.16.212.64/26	172.16.212.65 - 172.16.212.126	172.16.212.127
-255.255.255.192	cluster 03	172.16.212.128/26	172.16.212.129 - 172.16.212.190	172.16.212.191
-255.255.255.192	cluster 04	172.16.212.192/26	172.16.212.193 - 172.16.212.254	172.16.212.255
-255.255.255.0	podSubnet	172.16.213.0/24	172.16.213.1 - 172.16.213.254	172.16.213.255
-255.255.255.192	cluster 05	172.16.213.0/26	172.16.213.1 - 172.16.213.62	172.16.213.63
-255.255.255.192	cluster 06	172.16.213.64/26	172.16.213.65 - 172.16.213.126	172.16.213.127
-255.255.255.192	cluster 07	172.16.213.128/26	172.16.213.129 - 172.16.213.190	172.16.213.191
-255.255.255.192	cluster 08	172.16.213.192/26	172.16.213.193 - 172.16.213.254	172.16.213.255
-
-
-	#refer to documentation on all deployment options for kubevip
-	#https://github.com/kube-vip/kube-vip-cloud-provider
-
-- ingress example
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  ingressClassName: nginx
-  rules:
-  - http:
-      paths:
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: api-service
-            port:
-              number: 80
-
-- cluster IP example
-
-- Create a file named cluster-ip-demo.yaml with the following:
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend
-spec:
-  type: ClusterIP
-  ports:
-    - protocol: TCP
-      targetPort: 80
-      port: 80
-
-- This will be our service. Currently, it's not bound to anything so let's create a sample pod.
-
-- Create a file named pod-demo.yaml with the following:
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: demo-pod
-  labels:
-    app: demo-pod 
-    type: frontend-app
-spec:
-  containers:
-  - name: nginx-container
-    image: nginx
-
-- Now we can update our cluster-demo.yaml file to map our pods by their labels to the ClusterIP service.
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: Backend
-spec:
-  type: ClusterIP
-  ports:
-    - targerPort: 80
-      port: 80
-  selector:
-      name: demo-pod
-      type: frontend-app
-Now that we have configured the YAML files, we have to:
-
-Create and run our pods.
-Create and run our ClusterIP service.
-To run the pod, use the following command:
-
-kubectl apply -f pod-demo.yaml
-Next, let's create our service. Run the following command:
-
-kubectl create -f cluster-ip-demo.yaml
-Now that the pods are running inside our cluster, we will expose it to external traffic using Kubernetes proxy.
-
-Start the Kubernetes proxy using the following command:
-
-kubernetes proxy --port=8080
-
-###############################################################################
-##
-## On-Premises/Offline Install
-##
-##
-##
-
-
-
-
-
-
-
-###############################################################################
-##
-## COCloud Applications
-##
-##
-##
+Applications to be added or migrated to Kubernetes
 
 - Unifi controller on kubernetes
-- https://medium.com/@reefland/migrating-unifi-network-controller-from-docker-to-kubernetes-5aac8ed8da76
-- https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
+	https://medium.com/@reefland/migrating-unifi-network-controller-from-docker-to-kubernetes-5aac8ed8da76
+	https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
 
 - load balancing
-https://github.com/kube-vip/kube-vip-cloud-provider
-
-
-#################
+	https://github.com/kube-vip/kube-vip-cloud-provider
 
 - kube management
-https://portworx.com/
+	https://portworx.com/
