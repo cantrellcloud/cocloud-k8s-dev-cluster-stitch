@@ -4,8 +4,6 @@
 ---
 
 ## Table of Contents
-- [IP Addresses](#ipaddresses)
-- [System Settings](#systemsettings)
 
 ---
 
@@ -62,6 +60,7 @@ KUBEURNETES_INTERNAL_PRODUCTION_VLANS
 # Deploy Kubernetes
 
 ## Reference Sites
+
 https://www.virtualizationhowto.com/2023/12/how-to-install-kubernetes-in-ubuntu-22-04-with-kubeadm/
 https://controlplane.com/community-blog/post/the-complete-kubectl-cheat-sheet
 https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
@@ -131,7 +130,7 @@ The product_uuid can be checked by using the command
 
 - If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
 
-> mkdir -p -m 755 /etc/apt/keyrings
+	- mkdir -p -m 755 /etc/apt/keyrings
 
 `curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg`
 
@@ -151,7 +150,7 @@ apt-mark hold kubelet kubeadm kubectl
 
 10. enable kubelet service
 
-*** the kubelet will restart every few seconds, as it waits in a crashloop for kubeadm to tell it what to do.
+- the kubelet will restart every few seconds, as it waits in a crashloop for kubeadm to tell it what to do.
 
 `systemctl enable --now kubelet`
 
