@@ -121,13 +121,11 @@ The product_uuid can be checked by using the command
 
 5. update apt index and install packages for kubernetes
 
-`apt-get update`
+```apt-get update
+apt-get install -y apt-transport-https ca-certificates curl gpg net-tools gnupg
+```
 
-6. apt-transport-https may be a dummy package; if so, you can skip that package
-
-`apt-get install -y apt-transport-https ca-certificates curl gpg net-tools gnupg`
-
-7. download public signing key for kubernetes repositories
+6. download public signing key for kubernetes repositories
 
 - If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
 
@@ -135,13 +133,13 @@ The product_uuid can be checked by using the command
 
 `curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg`
 
-8. add kubernetes apt repository
+7. add kubernetes apt repository
 
 - This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
 
 `echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list`
 
-9. update apt index and install kubernetes packages
+8. update apt index and install kubernetes packages
 
 ```
 apt-get update
@@ -149,13 +147,13 @@ apt-get install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 ```
 
-10. enable kubelet service
+9. enable kubelet service
 
 - the kubelet will restart every few seconds, as it waits in a crashloop for kubeadm to tell it what to do.
 
 `systemctl enable --now kubelet`
 
-11. Update firewall rules
+10. Update firewall rules
 
 - enable firewall and add rules
 
@@ -201,9 +199,9 @@ alias ka='kubectl apply'
 alias kdelf='kubectl delete -f'
 alias kl='kubectl logs'
 alias kgall='kubectl get all -A'
-```
 
-`source ~/.bash_aliases`
+source ~/.bash_aliases
+```
 
 - kernel parameters for containerD
 
@@ -224,7 +222,7 @@ EOT
 sysctl --system
 ```
 
-12. Installing Containerd container runtime
+11. Installing Containerd container runtime
 
 - setup Docker’s apt repository
 
@@ -272,7 +270,7 @@ systemctl enable containerd
 systemctl status containerd
 ```
 
-13. Pull kubeadm config images and initialize default configuration
+12. Pull kubeadm config images and initialize default configuration
 
 - pull kubeadm default config
 
