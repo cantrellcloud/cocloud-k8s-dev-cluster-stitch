@@ -248,14 +248,14 @@ data:
   DB_Password: cGFzd3Jk
 ```
 
+add this to pod definition files
+
 
 ```
 envFrom:
 - secretRef:
   name: app-secret
 ```
-
-##### add this to pod definition files
 
 ### Repositories
 
