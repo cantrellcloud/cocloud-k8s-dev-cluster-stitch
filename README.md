@@ -130,7 +130,7 @@ The product_uuid can be checked by using the command
 
 - If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
 
-	- mkdir -p -m 755 /etc/apt/keyrings
+	- `mkdir -p -m 755 /etc/apt/keyrings`
 
 `curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg`
 
