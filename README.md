@@ -356,7 +356,7 @@ kubeadm config images pull
 ```
 
 - initialize default configuration
-	- if building an image, this is a good point to take snapshot 1
+	- if building an image, this is a good time to take snapshot 1
 
 `kubeadm init`
 
@@ -431,11 +431,11 @@ kubectl create -f custom-resources.yaml
 	  vxlanMode: CrossSubnet
 	```
 
-- if building an image, this is a good point to take snapshot 2
-
 17. Verify Kubernetes is running
 
 `kubectl get nodes`
+
+if building an image, this is a good time to take snapshot 2
 
 18. Add additional nodes to cluster and labels, taints, and tolerances
 
