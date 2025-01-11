@@ -123,7 +123,7 @@ The product_uuid can be checked by using the command
 
 7. download public signing key for kubernetes repositories
 
-*** If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
+-If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
 
 > mkdir -p -m 755 /etc/apt/keyrings
 
@@ -131,7 +131,7 @@ The product_uuid can be checked by using the command
 
 8. add kubernetes apt repository
 
-*** This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
+-This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
 
 `echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list`
 
