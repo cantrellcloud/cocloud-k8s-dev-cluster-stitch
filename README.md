@@ -3,6 +3,12 @@
 
 ---
 
+## Table of Contents
+- [IP Addresses] (#ipaddresses)
+- [System Settings](#systemsettings)
+
+---
+
 # IP Addresses
 
 ```
