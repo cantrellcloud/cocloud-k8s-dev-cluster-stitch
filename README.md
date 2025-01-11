@@ -61,7 +61,7 @@ Clusters will be packageable for multiple deployments on any storage.
 
 ### Reserved Cluster IP Address Blocks
 
-- example of ip networks and subnets
+Example of IP Networks
 
 ```
 KUBEURNETES_EXTERNAL_ROUTED_VLANS
@@ -109,7 +109,7 @@ KUBEURNETES_INTERNAL_PRODUCTION_VLANS
 255.255.255.224	namespace	172.16.69.224/27	172.16.69.225 - 172.16.69.254	172.16.69.255`
 ```
 
-- COCloud networks and subnets
+COCloud Networks
 
 ```
 255.255.254.0	COPINE K8 Cluster - serviceSubnets	10.0.212.0/23		10.0.212.1 - 10.0.213.254		10.0.213.255
@@ -169,7 +169,9 @@ https://stackoverflow.com/questions/28857993/how-does-kubernetes-scheduler-work
 
 Monitoring
 
-`kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml`
+```
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
 
 ```kubectl top node
 kubectl top pod
@@ -177,7 +179,9 @@ kubectl top pod
 
 Logging
 
-`kubectl logs -f pod-name-here container-name-here`
+```
+kubectl logs -f pod-name-here container-name-here
+```
 
 Rollouts
 
@@ -214,7 +218,9 @@ data:
 	APP_MODE: prod
 ```
 
-`kubectl get configmaps`
+```
+kubectl get configmaps
+```
 
 Secrets
 
@@ -276,12 +282,15 @@ download.docker.com/linux/ubuntu
 You can get the MAC address of the network interfaces using the command ip link or ifconfig -a
 The product_uuid can be checked by using the command
 
-`cat /sys/class/dmi/id/product_uuid`
-
+```
+cat /sys/class/dmi/id/product_uuid
+```
 
 2. Update hosts file on hosts
 
-/etc/hosts
+```
+vi /etc/hosts
+```
 
 ```
 10.0.69.41 k8dev-adm01.k8s.cantrellcloud.net
@@ -299,33 +308,43 @@ The product_uuid can be checked by using the command
 172.16.69.52 copine-k8nod02.cantrellcloud.net
 ```
 
-3. turn off swap
+3. Turn off swap
 
-`swapoff-a`
+```
+swapoff-a
+```
 
-4. turn off swap persistent across reboots
+4. Turn off swap persistent across reboots
 
-`disable swap in --/etc/fstab`
+Disable swap in --/etc/fstab
 
-5. update apt index and install packages for kubernetes
+```
+vi /etc/fstab
+```
+
+5. Update apt index and install packages for kubernetes
 
 ```apt-get update
 apt-get install -y apt-transport-https ca-certificates curl gpg net-tools gnupg
 ```
 
-6. download public signing key for kubernetes repositories
+6. Download public signing key for kubernetes repositories
 
-- If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
+If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
 
-	- `mkdir -p -m 755 /etc/apt/keyrings`
+- `mkdir -p -m 755 /etc/apt/keyrings`
 
-`curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg`
+```
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+```
 
 7. add kubernetes apt repository
 
-- This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
+This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
 
-`echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list`
+```
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
+```
 
 8. update apt index and install kubernetes packages
 
@@ -337,17 +356,21 @@ apt-mark hold kubelet kubeadm kubectl
 
 9. enable kubelet service
 
-- the kubelet will restart every few seconds, as it waits in a crashloop for kubeadm to tell it what to do.
+the kubelet will restart every few seconds, as it waits in a crashloop for kubeadm to tell it what to do.
 
-`systemctl enable --now kubelet`
+```
+systemctl enable --now kubelet
+```
 
 10. Update firewall rules
 
-- enable firewall and add rules
+enable firewall and add rules
 
-`ufw enable`
+```
+ufw enable
+```
 
-- Control Plane rules
+Control Plane rules
 
 ```
 ufw allow 22/tcp
@@ -361,7 +384,7 @@ ufw allow 10259/tcp
 ufw allow 10257/tcp
 ```
 
-- Worker Nodes rules
+Worker Nodes rules
 
 ```
 ufw allow 22/tcp
@@ -371,17 +394,21 @@ ufw allow 10256/tcp
 ufw allow 30000:32767/tcp
 ```
 
-- check firewall status
+check firewall status
 
-`ufw status verbose`
+```
+ufw status verbose
+```
 
 11. add command line aliases for frequently used commands
 
-- edit command alias file
+edit command alias file
 
-`vi ~/.bash_aliases`
+```
+vi ~/.bash_aliases
+```
 
-- add aliases and make active
+add aliases and make active
 
 ```
 alias k=kubectl
@@ -418,15 +445,17 @@ sysctl --system
 
 13. Installing Containerd container runtime
 
-- setup Docker’s apt repository
+setup Docker’s apt repository
 
 ```apt update
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 ```
 
-- Add the repository to Apt sources:
+Add the repository to Apt sources:
 
-`deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable`
+```
+deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable
+```
 
 or this way:
 		
@@ -437,26 +466,30 @@ $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
 tee /etc/apt/sources.list.d/docker.list /dev/null
 ```
 
-- install containerd
+install containerd
 
 ```
 apt update
 apt install containerd.io -y
 ```
 
-- configure the system so it starts using systemd as cgroup
+configure the system so it starts using systemd as cgroup
 
-`containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1`
+```
+containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1
+```
 
-- verify containerd config file
+verify containerd config file
 
-`vi /etc/containerd/config.toml`
+```
+vi /etc/containerd/config.toml
+```
 
 > ...
 >   [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
 >     SystemdCgroup = true
 
-- setup the service to start automatically and check to make sure it is running
+setup the service to start automatically and check to make sure it is running
 
 ```
 systemctl restart containerd
@@ -466,19 +499,21 @@ systemctl status containerd
 
 14. Pull kubeadm config images and initialize default configuration
 
-- pull kubeadm default config
+pull kubeadm default config
 
 ```
 sysctl --system
 kubeadm config images pull
 ```
 
-- initialize default configuration
-	- if building an image, this is a good time to take snapshot 1
+initialize default configuration
+- if building an image, this is a good time to take snapshot 1
 
-`kubeadm init`
+```
+kubeadm init
+```
 
-- Perform next commands as a regular user
+Perform next commands as a regular user
 
 ```
 mkdir -p $HOME/.kube
@@ -488,9 +523,11 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 15. Modify the kubelet ConfigMap
 
-- Should be set, run command to verify cgroupDriver: systemd
+Should be set, run command to verify cgroupDriver: systemd
 
-`kubectl edit cm kubelet-config -n kube-system`
+```
+kubectl edit cm kubelet-config -n kube-system
+```
 
 16. Install Calico network overlay
 
@@ -500,18 +537,22 @@ curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/cu
 kubectl create -f custom-resources.yaml
 ```
 
-- initialize overlay
+initialize overlay
 
-`kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml`
+```
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+```
 
-- may take a few minutes for all nodes in the cluster to spin up all the networking nodes and **report ready**
-	- you can watch by entering the following command
+may take a few minutes for all nodes in the cluster to spin up all the networking nodes and **report ready**
+- you can watch by entering the following command
 	
-	`watch kubectl get pods -n calico-system`
+	```
+	watch kubectl get pods -n calico-system
+	```
 
-- Configure NSX overlay
-	- it is best practice to use manifest (yaml) files which will be added in a future release
-	- for now, create config.yaml files for each of the following IPPools to enable NSX overlay
+Configure NSX overlay
+- it is best practice to use manifest (yaml) files which will be added in a future release
+- for now, create config.yaml files for each of the following IPPools to enable NSX overlay
 
 	```
 	apiVersion: crd.projectcalico.org/v1
@@ -551,18 +592,22 @@ kubectl create -f custom-resources.yaml
 
 17. Verify Kubernetes is running
 
-`kubectl get nodes`
+```
+kubectl get nodes
+```
 
 if building an image, this is a good time to take snapshot 2
 
 18. Add additional nodes to cluster and labels, taints, and tolerances
 
-- To join nodes, you must fist have a key
-- Copy/paste the displayed command to other nodes that are ready to be added to the cluster
+To join nodes, you must fist have a key
+Copy/paste the displayed output to other nodes that are ready to be added to the cluster
 
-`kubeadm token create --print-join-command`
+```
+kubeadm token create --print-join-command
+```
 
-- on each worker node as a regular user
+on each worker node as a regular user
 
 ```
 mkdir -p $HOME/.kube
@@ -570,13 +615,17 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-- label nodes
+label nodes
 
-`kubectl label node nodename key=value`
+```
+kubectl label node nodename key=value
+```
 
-- to bash into a pod
+to bash into a pod
 
-`k exec --stdin --tty dev-intdmz-linux-test-65bf85b85d-lnnhw --namespace=dev-external -- /bin/bash`
+```
+k exec --stdin --tty dev-intdmz-linux-test-65bf85b85d-lnnhw --namespace=dev-external -- /bin/bash
+```
 
 ---
 
@@ -584,12 +633,15 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 Applications to be added or migrated to Kubernetes
 
-- Unifi controller on kubernetes
+Unifi controller on kubernetes
+
 	https://medium.com/@reefland/migrating-unifi-network-controller-from-docker-to-kubernetes-5aac8ed8da76
 	https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
 
-- load balancing
+ load balancing
+
 	https://github.com/kube-vip/kube-vip-cloud-provider
 
-- kube management
+kube management
+
 	https://portworx.com/
