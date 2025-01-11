@@ -9,10 +9,15 @@
 
 ## Introduction
 
-Following the instructions given, you should be able to configure and initialize a default
-Kubernetes cluster with NSX networking overlays
+After carefully following the below instructions, only a single master cluster will be deployed.
+You then need to join any other node using the generated key and label.
 
-### This is the desired end state
+Following the instructions given, you should be able to configure and initialize a default
+Kubernetes cluster with NSX networking overlays.
+
+### This is the desired end state for the Enterprise
+
+Clusters will be packageable for multiple deployments on any storage.
 
 ```
 +===============================================================================================+
