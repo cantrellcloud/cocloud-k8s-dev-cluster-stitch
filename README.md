@@ -255,7 +255,7 @@ envFrom:
   name: app-secret
 ```
 
-	- add this to pod definition files
+##### add this to pod definition files
 
 ### Repositories
 
