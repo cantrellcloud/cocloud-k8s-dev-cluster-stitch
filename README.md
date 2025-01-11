@@ -158,10 +158,13 @@ apt-mark hold kubelet kubeadm kubectl
 
 ## Update firewall rules
 
-* enable firewall
-ufw enable
+1. enable firewall and add rules
 
-*Control Plane rules
+`ufw enable`
+
+- Control Plane rules
+
+```
 ufw allow 22/tcp
 ufw allow 6443/tcp
 ufw allow 2379/tcp
@@ -171,18 +174,27 @@ ufw allow 10248/tcp
 ufw allow 10250/tcp
 ufw allow 10259/tcp
 ufw allow 10257/tcp
+```
 
-*Worker Nodes rules
+- Worker Nodes rules
+
+```
 ufw allow 22/tcp
 ufw allow 5473/tcp
 ufw allow 10250/tcp
 ufw allow 10256/tcp
 ufw allow 30000:32767/tcp
+```
 
-ufw status verbose
+- check firewall status
 
-*command alias
-vi ~/.bash_aliases
+`ufw status verbose`
+
+- command alias
+
+`vi ~/.bash_aliases`
+
+```
 alias k=kubectl
 alias kg='kubectl get'
 alias kd='kubectl describe'
@@ -190,6 +202,7 @@ alias ka='kubectl apply'
 alias kdelf='kubectl delete -f'
 alias kl='kubectl logs'
 alias kgall='kubectl get all -A'
+```
 
 source ~/.bash_aliases
 
