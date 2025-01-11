@@ -65,6 +65,7 @@ https://www.virtualizationhowto.com/2023/12/how-to-install-kubernetes-in-ubuntu-
 https://controlplane.com/community-blog/post/the-complete-kubectl-cheat-sheet
 https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
 https://docs.tigera.io/calico/latest/operations/calicoctl/install#install-calicoctl-as-a-kubectl-plugin-on-a-single-host
+https://kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/
 
 ## Repositories
 
@@ -227,69 +228,71 @@ sysctl --system
 
 - setup Docker’s apt repository
 
-apt update
+```apt update
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+```
 
-*Add the repository to Apt sources:
-deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable
-	#or this way:
+- Add the repository to Apt sources:
+
+`deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable`
+
+		- or this way:
+		
+```
 echo \
 "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
 $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
 tee /etc/apt/sources.list.d/docker.list /dev/null
+```
 
+- install containerd
+
+```
 apt update
-
-*install containerd
 apt install containerd.io -y
+```
 
-*configure the system so it starts using systemd as cgroup
-containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1
+- configure the system so it starts using systemd as cgroup
 
-*vi /etc/containerd/config.toml
-...
-  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-    SystemdCgroup = true
+`containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1`
 
+- verify containerd config file
 
-*setup the service to start automatically and check to make sure it is running
+`vi /etc/containerd/config.toml`
+
+> ...
+>   [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+>     SystemdCgroup = true
+
+- setup the service to start automatically and check to make sure it is running
+
+```
 systemctl restart containerd
 systemctl enable containerd
 systemctl status containerd
+```
 
+13. Pull kubeadm config images and initialize default configuration
 
-##Setting Up Kubernetes Repositories
+- pull kubeadm default config
 
-	#Not needed:
-		*Pull down the GPG key
-		curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-		echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
-
-		*Update the apt package index
-		apt-get update
-
-			#may not need this:
-		*subnet.env file
-		cat <<EOF | tee /run/flannel/subnet.env
-		FLANNEL_NETWORK=10.244.0.0/16
-		FLANNEL_SUBNET=10.244.0.0/16
-		FLANNEL_MTU=1450
-		FLANNEL_IPMASQ=true
-		EOF
-
+```
 sysctl --system
 kubeadm config images pull
-*take snapshot 1
+```
 
-create kubeadm configuration files #https://kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/
-kubeadm init
+- initialize default configuration
+	- if building an image, this is a good point to take snapshot 1
 
+`kubeadm init`
 
-*As a regular user
+- Perform next commands as a regular user
+
+```
 mkdir -p $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown $(id -u):$(id -g) $HOME/.kube/config
-
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
 
 ##Modify the kubelet ConfigMap
 	#Should be set, run command to verify cgroupDriver: systemd
@@ -301,18 +304,18 @@ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1
 curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml -O
 kubectl create -f custom-resources.yaml
 
-*initialize calico network overlay
+- initialize calico network overlay
 kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
-*may take a few minutes for all nodes in the cluster to spin up all the networking nodes and report ready
+- may take a few minutes for all nodes in the cluster to spin up all the networking nodes and report ready
 watch kubectl get pods -n calico-system
 
 	#Worker nodes may be added at this time
 
-*Configure BGP
+- Configure BGP
 	#If planning to use NSX network overlay, BGP is not needed
 
-*Configure NSX overlay
+- Configure NSX overlay
 apiVersion: crd.projectcalico.org/v1
 kind: IPPool
 metadata:
@@ -346,26 +349,25 @@ spec:
   nodeSelector: all()
   vxlanMode: CrossSubnet
 
-*take snapshot 2
+- take snapshot 2
 
 
 
-##Join nodes to cluster
+## Join nodes to cluster
 	#To view the join token:
-*kubeadm token create --print-join-command
+- kubeadm token create --print-join-command
 
-*on each worker node
+- on each worker node
 mkdir -p $HOME/.kube
-**cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 
-*label nodes
-kubectl label node k8dev-wkr01 node-role.kubernetes.io/worker=worker
-kubectl label node k8dev-wkr02 node-role.kubernetes.io/worker=worker
+- label nodes
+kubectl label node nodename key=value
 
-------------------------------------------------------------------------------------------------------------------
+## Manifests
 
-*create continuous running ubuntu server for cluster maintenance
+- create continuous running ubuntu server for cluster maintenance
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -400,7 +402,7 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
 
-*create test application
+- create test application
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -432,7 +434,7 @@ spec:
       terminationGracePeriodSeconds: 30
 
 
-*to bash into a pod
+- to bash into a pod
 k exec --stdin --tty dev-intdmz-linux-test-65bf85b85d-lnnhw --namespace=dev-external -- /bin/bash
 
 
@@ -444,7 +446,7 @@ k exec --stdin --tty dev-intdmz-linux-test-65bf85b85d-lnnhw --namespace=dev-exte
 ##
 ##
 
-*this is the preferred deployment model
+- this is the preferred deployment model
 
 kube-vip-cloud-provider
 
@@ -480,8 +482,8 @@ kube-vip-cloud-provider
 
 ##Create: NameSpaceVIPs, IP-Pools, Ingress, ClusterIPs, and Services
 
-*kube-vip-cloud-provider
-*A service will take an address based upon its namespace pool cidr/range-namespace
+- kube-vip-cloud-provider
+- A service will take an address based upon its namespace pool cidr/range-namespace
 
 $ kubectl get configmap -n <$NAMESPACEkubevip -o yaml
 
@@ -497,7 +499,7 @@ data:
   cidr-<$APP99>: xxx.xxx.xxx.xxx/xx
   cidr-ipv6: xxxx::xx/xxx  #do not use IPv6 until deployed onto Production cluster
 
-*create IP-Pools
+- create IP-Pools
 Create an IP pool using a CIDR
 kubectl create configmap --namespace kube-system kubevip --from-literal cidr-global=192.168.0.220/29
 
@@ -534,7 +536,7 @@ kubectl create configmap --namespace dns-pihole dns-pihole --from-literal cidr-g
 	#refer to documentation on all deployment options for kubevip
 	#https://github.com/kube-vip/kube-vip-cloud-provider
 
-*ingress example
+- ingress example
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -554,9 +556,9 @@ spec:
             port:
               number: 80
 
-*cluster IP example
+- cluster IP example
 
-*Create a file named cluster-ip-demo.yaml with the following:
+- Create a file named cluster-ip-demo.yaml with the following:
 
 apiVersion: v1
 kind: Service
@@ -569,9 +571,9 @@ spec:
       targetPort: 80
       port: 80
 
-*This will be our service. Currently, it's not bound to anything so let's create a sample pod.
+- This will be our service. Currently, it's not bound to anything so let's create a sample pod.
 
-*Create a file named pod-demo.yaml with the following:
+- Create a file named pod-demo.yaml with the following:
 
 apiVersion: v1
 kind: Pod
@@ -585,7 +587,7 @@ spec:
   - name: nginx-container
     image: nginx
 
-*Now we can update our cluster-demo.yaml file to map our pods by their labels to the ClusterIP service.
+- Now we can update our cluster-demo.yaml file to map our pods by their labels to the ClusterIP service.
 
 apiVersion: v1
 kind: Service
@@ -635,15 +637,15 @@ kubernetes proxy --port=8080
 ##
 ##
 
-*Unifi controller on kubernetes
-*https://medium.com/@reefland/migrating-unifi-network-controller-from-docker-to-kubernetes-5aac8ed8da76
-*https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
+- Unifi controller on kubernetes
+- https://medium.com/@reefland/migrating-unifi-network-controller-from-docker-to-kubernetes-5aac8ed8da76
+- https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
 
-*load balancing
+- load balancing
 https://github.com/kube-vip/kube-vip-cloud-provider
 
 
 #################
 
-*kube management
+- kube management
 https://portworx.com/
