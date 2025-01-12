@@ -1,6 +1,7 @@
 # cocloud-k8s-dev-cluster-stitch
- COCloud K8s Development Cluster Stitch
- on Ubuntu 24.04.1 LTS
+
+COCloud K8s Development Cluster Stitch
+on Ubuntu 24.04.1 LTS
 
 Cantrell Cloud Enterprise Services
 designed by:
@@ -341,7 +342,48 @@ Storage
 How to add Azure Files for persistant storage
 
   - Container storage interface (CSI)
+
+Networking
+
+  - CoreDNS
   
+  https://github.com/kubernetes/dns/blob/master/docs/specification.md
+
+  https://coredns.io/plugins/kubernetes/
+  
+  - Network Namespaces (Linux)
+  
+  ```
+  ip netns add red
+  ip netns add blue
+ 
+  ip link add v-net-0 type bridge
+  ip link set dev v-net-0 up
+  
+  ip -n red link del veth-red
+  
+  ip link add veth-red type veth peer name veth-red-br
+  ip link add veth-blue type veth peer name veth-blue-br
+  
+  ip link set veth-red netns red
+  ip link set veth-red-br master v-net-0
+  ip link set veth-blue netns blue
+  ip link set veth-blue-br master v-net-0
+  
+  ip -n red addr add <IPADDRESS> dev veth-red
+  ip -n blue addr add <IPADDRESS> dev veth-blue
+
+  ip -n red link set veth-red up  
+  ip -n blue link set veth-blue up
+  
+  ip addr add 192.168.15.5/24 dev v-net-0
+  
+  ip netns exec blue ip route add 192.168.1.0/24 via 192.168.15.5
+  iptables -t nat -A POSTROUTING -s 192.168.15.0/24 -j MASQUERADE
+  
+  ip netns exec blue ip route add default via 192.168.15.5
+  ```
+
 ### Repositories
 
 ```
