@@ -311,8 +311,20 @@ systemctl restart kubelet
 
 ```
 kubectl uncordon node
+```
+
+Backup
 
 ```
+kubectl get all --all-namespaces -o yaml > all-deploy-services.yaml
+```
+
+  - Backup ETCD Cluster
+  
+  ```
+  ETCDCTL_API=3 etcdctl \
+    snapshot save snapshot.db
+  ```
 
 ### Repositories
 
