@@ -224,11 +224,14 @@ kubectl get configmaps
 
 Secrets
 
+Dive deep into the world of Kubernetes security with a comprehensive guide to Secret Store CSI Driver.
+https://www.youtube.com/watch?v=MTnQW9MxnRI
+
 - Secrets are not encrypted. They are **encoded**.
   - Do not check-in Secret objects to SCM (Github) along with code
 - Secrets are not encrypted in ETCD
   - Enable encryption at rest
-- Anyone able to create pods/de in the name namespace can acces the secrets
+- Anyone able to create application, deployment, or pods in the name namespace can acces the secrets
   - Configure RBAC
   - Consider third-party Secret provider
 
@@ -262,11 +265,53 @@ data:
 
 Add to pod definition files
 
-
 ```
 envFrom:
 - secretRef:
   name: app-secret
+```
+
+Cluster Maintenance
+
+```
+kubectl drain node-1
+kubectl cordon node-2
+kubectl uncordon node-1
+```
+
+  Cluster Upgrade
+
+  - On Master Node(s)
+
+```
+apt-get upgrade -y kubeadm=x.xx.x-xx
+kubeadm upgrade apply vx.xx.x
+
+apt-get upgrade -y kubelet=x.xx.x-xx
+systemctl restart kubelet
+
+```
+
+  - From a master node, drain nodes one-by-one and perform upgrade
+
+```
+kubectl drain node
+```
+
+  - From each node after it has been drained and cordoned
+
+```
+apt-get upgrade -y kubeadm=x.xx.x-xx
+apt-get upgrade -y kubelet=x.xx.x-xx
+kubeadm upgrade node config --kubelet-version vx.xx.x
+systemctl restart kubelet
+```
+
+  - From a master node, uncordon nodes one-by-one after being upgraded
+
+```
+kubectl uncordon node
+
 ```
 
 ### Repositories
@@ -646,10 +691,14 @@ Unifi controller on kubernetes
 	https://medium.com/@reefland/migrating-unifi-network-controller-from-docker-to-kubernetes-5aac8ed8da76
 	https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
 
- load balancing
+Load balancing
 
 	https://github.com/kube-vip/kube-vip-cloud-provider
 
-kube management
+Kube management
 
 	https://portworx.com/
+
+HashiCorp Vault deployed on K8s
+
+	In a future release
