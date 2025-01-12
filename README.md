@@ -279,7 +279,7 @@ kubectl cordon node-2
 kubectl uncordon node-1
 ```
 
-  Cluster Upgrade
+- Cluster Upgrade
 
   - On Master Node(s)
 
