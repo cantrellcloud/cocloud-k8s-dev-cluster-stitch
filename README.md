@@ -1,11 +1,15 @@
 # cocloud-k8s-dev-cluster-stitch
 
 COCloud K8s Development Cluster Stitch
+
 on Ubuntu 24.04.1 LTS
 
 Cantrell Cloud Enterprise Services
+
 designed by:
+
 	Ron Cantrell
+
 	ron@cantrelloffice.cloud
 
 ---
