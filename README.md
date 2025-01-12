@@ -315,6 +315,12 @@ kubectl uncordon node
 
 Backup
 
+https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster
+
+https://github.com/etcd-io/website/blob/main/content/en/docs/v3.5/op-guide/recovery.md
+
+https://www.youtube.com/watch?v=qRPNuT080Hk
+
 ```
 kubectl get all --all-namespaces -o yaml > all-deploy-services.yaml
 ```
@@ -326,6 +332,16 @@ kubectl get all --all-namespaces -o yaml > all-deploy-services.yaml
     snapshot save snapshot.db
   ```
 
+Storage
+
+  - Storage Drivers
+  
+  - Volume Drivers
+
+How to add Azure Files for persistant storage
+
+  - Container storage interface (CSI)
+  
 ### Repositories
 
 ```
