@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devapp01
+  namespace: dev-internal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devapp01
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: devapp01
+    spec:
+      containers:
+        - name: devapp01
+          image: ubuntu:xenial
+          ports:
+            - containerPort: 2201
+          command: ["printenv"]
+          args: ["HOSTNAME", "KUBERNETES_PORT"]
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30

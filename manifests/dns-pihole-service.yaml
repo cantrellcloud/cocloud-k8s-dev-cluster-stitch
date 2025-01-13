@@ -4,7 +4,7 @@ metadata:
   name: pihole-pods
   namespace: dns-pihole
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: pihole
@@ -22,13 +22,25 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: pihole-clusterip
+  name: pihole-service
   namespace: dns-pihole
 spec:
-  selector:
-    app: pihole
+  clusterIP: 10.96.212.110
+  clusterIPs:
+    - 10.96.212.110
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
   ports:
-    - protocol: TCP
-      port: 30080
-      targetPort: 80
-  type: ClusterIP
+  - nodePort: 30080
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+      name: pihole
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
