@@ -3,6 +3,7 @@
 COCloud K8s Development Cluster Stitch
 
 on Ubuntu 24.04.1 LTS
+on Talos Linux 1.9
 
 > Cantrell Cloud Enterprise Services
 > 
@@ -153,6 +154,77 @@ COCloud Networks
 ---
 
 ## Deploy Kubernetes
+
+Talos Linux
+
+### References and Notes
+
+### Repositories
+
+```
+raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
+raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml
+github.com/projectcalico/calico/releases/download/v3.29.1/calicoctl-linux-amd64
+downloads.tigera.io/ee/binaries/v3.19.4/calicoctl
+pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
+download.docker.com/linux/ubuntu/gpg
+download.docker.com/linux/ubuntu
+```
+
+---
+
+### Talos System Configuation and Initialization
+
+Requirements
+	QEMU
+	Docker
+	talosctl
+	
+
+registry01
+
+172.16.68.49/27
+
+172.16.68.33
+
+10.0.15.11, 10.0.15.12
+
+install Talos Linux CLI
+
+curl -sL https://talos.dev/install | sh
+
+Identify Required Talos Images
+talosctl image default
+
+Prepare Internal Registry
+docker run -d -p 6000:5000 --restart always --name registry-airgapped registry:2
+ 1bf09802bee1476bc463d972c686f90a64640d87dacce1ac8485585de69c91a5
+for image in `talosctl image default`; do docker pull $image; done
+for image in `talosctl image default`; do \
+    docker tag $image `echo $image | sed -E 's#^[^/]+/#127.0.0.1:6000/#'`; \
+	done
+
+for image in `talosctl image default`; do \
+    docker push `echo $image | sed -E 's#^[^/]+/#127.0.0.1:6000/#'`; \
+    done
+
+for image in $(cat talosctl-images.list) ; do \
+    docker tag $image `echo $image | sed -E 's#^[^/]+/#127.0.0.1:6000/#'`; \
+	done
+
+
+
+for image in `talosctl image default`; do \
+    docker tag $image `echo $image | sed -E 's#^[^/]+/#ccesregistry01.azurecr.io/#'`; \
+	done
+
+for image in `talosctl image default`; do \
+    docker push `echo $image | sed -E 's#^[^/]+/#ccesregistry01.azurecr.io/#'`; \
+    done
+
+
+
+Ubuntu Linux
 
 ### References and Notes
 
@@ -393,6 +465,70 @@ Networking
   
   ip netns exec blue ip route add default via 192.168.15.5
   ```
+
+  - To forward a port to a namespace on a node
+  
+  ```
+  iptables -t nat -A PREROUTING --dport 80 --to-destination 192.168.15.2:80 -j DNAT
+  ```
+
+  - Docker Networking
+  
+  - CNI
+  
+  '/opt/cni/bin'
+  
+  '/etc/cni'
+  
+  'ps -aux | grep kubelet | grep --color container-runtime-endpoint'
+  
+  kubectl logs -n kube-system
+  
+Deploying a high availability Kubernetes cluster running the Rocket.Chat application across three data centers involves several key milestones. Here’s a high-level overview:
+
+### 1. **Planning and Design**
+- **Requirements Gathering**: Identify the hardware, software, and network requirements.
+- **Architecture Design**: Design the architecture, including the layout of the Kubernetes clusters, network topology, and data center interconnections.
+- **High Availability Strategy**: Plan for redundancy and failover mechanisms across the three data centers.
+
+### 2. **Infrastructure Setup**
+- **Provisioning Resources**: Set up the necessary compute, storage, and network resources in each data center.
+- **Networking Configuration**: Configure networking to ensure connectivity between the data centers, including VPNs or dedicated links.
+
+### 3. **Kubernetes Cluster Deployment**
+- **Cluster Initialization**: Deploy Kubernetes clusters in each data center using tools like kubeadm, kops, or managed services (e.g., GKE, EKS, AKS).
+- **Cluster Federation**: Set up Kubernetes federation or use multi-cluster management tools (e.g., Rancher, Anthos) to manage the clusters across the data centers.
+
+### 4. **Rocket.Chat Deployment**
+- **Containerization**: Create Docker images for Rocket.Chat and its dependencies (e.g., MongoDB).
+- **Helm Charts**: Use Helm charts to define and deploy Rocket.Chat applications across the Kubernetes clusters.
+- **Persistent Storage**: Configure persistent storage solutions (e.g., NFS, Ceph) to ensure data availability across the clusters.
+
+### 5. **Load Balancing and Traffic Management**
+- **Ingress Controllers**: Deploy ingress controllers (e.g., NGINX, Traefik) to manage incoming traffic.
+- **Global Load Balancer**: Set up a global load balancer to distribute traffic across the data centers.
+
+### 6. **Monitoring and Logging**
+- **Monitoring Tools**: Deploy monitoring tools (e.g., Prometheus, Grafana) to monitor the health and performance of the clusters and applications.
+- **Logging Solutions**: Implement centralized logging solutions (e.g., ELK stack, Fluentd) to collect and analyze logs from all clusters.
+
+### 7. **Security and Compliance**
+- **Access Control**: Implement RBAC (Role-Based Access Control) to manage access to the Kubernetes clusters.
+- **Network Policies**: Define network policies to control traffic between pods and services.
+- **Compliance Checks**: Ensure the deployment complies with relevant security and regulatory standards.
+
+### 8. **Testing and Validation**
+- **Functional Testing**: Perform functional testing to ensure Rocket.Chat operates correctly.
+- **Failover Testing**: Test failover scenarios to validate high availability and disaster recovery plans.
+
+### 9. **Go-Live and Maintenance**
+- **Deployment**: Deploy the Rocket.Chat application to production.
+- **Ongoing Maintenance**: Regularly update and maintain the clusters and applications, monitor performance, and address any issues.
+
+Would you like more details on any specific milestone?  
+  
+  
+  
 
 ### Repositories
 
