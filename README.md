@@ -487,6 +487,15 @@ Networking
   
   kubectl logs -n kube-system
   
+
+  - Ingress
+  
+  Nginx is part of Kube project
+  
+  
+
+
+
 Deploying a high availability Kubernetes cluster running the Rocket.Chat application across three data centers involves several key milestones. Here’s a high-level overview:
 
 ### 1. **Planning and Design**
