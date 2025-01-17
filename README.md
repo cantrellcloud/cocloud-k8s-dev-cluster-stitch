@@ -167,8 +167,8 @@ raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resource
 github.com/projectcalico/calico/releases/download/v3.29.1/calicoctl-linux-amd64
 downloads.tigera.io/ee/binaries/v3.19.4/calicoctl
 pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
-download.docker.com/linux/ubuntu/gpg
-download.docker.com/linux/ubuntu
+download.nerdctl.com/linux/ubuntu/gpg
+download.nerdctl.com/linux/ubuntu
 ```
 
 ---
@@ -177,7 +177,7 @@ download.docker.com/linux/ubuntu
 
 Requirements
 	QEMU
-	Docker
+	nerdctl
 	talosctl
 	
 
@@ -189,37 +189,40 @@ registry01
 
 10.0.15.11, 10.0.15.12
 
-install Talos Linux CLI
+install nerdctl
+https://github.com/containerd/nerdctl/releases/download/v2.0.2/nerdctl-2.0.2-linux-amd64.tar.gz
+tar Cxzvvf /usr/local /home/coadminlocal/nerdctl-2.0.2-linux-amd64.tar.gz
 
+install Talos Linux CLI
 curl -sL https://talos.dev/install | sh
 
 Identify Required Talos Images
 talosctl image default
 
 Prepare Internal Registry
-docker run -d -p 6000:5000 --restart always --name registry-airgapped registry:2
+nerdctl run -d -p 6000:5000 --restart always --name registry-airgapped registry:2
  1bf09802bee1476bc463d972c686f90a64640d87dacce1ac8485585de69c91a5
-for image in `talosctl image default`; do docker pull $image; done
+for image in `talosctl image default`; do nerdctl pull $image; done
 for image in `talosctl image default`; do \
-    docker tag $image `echo $image | sed -E 's#^[^/]+/#127.0.0.1:6000/#'`; \
+    nerdctl tag $image `echo $image | sed -E 's#^[^/]+/#127.0.0.1:6000/#'`; \
 	done
 
 for image in `talosctl image default`; do \
-    docker push `echo $image | sed -E 's#^[^/]+/#127.0.0.1:6000/#'`; \
+    nerdctl push `echo $image | sed -E 's#^[^/]+/#127.0.0.1:6000/#'`; \
     done
 
 for image in $(cat talosctl-images.list) ; do \
-    docker tag $image `echo $image | sed -E 's#^[^/]+/#127.0.0.1:6000/#'`; \
+    nerdctl tag $image `echo $image | sed -E 's#^[^/]+/#127.0.0.1:6000/#'`; \
 	done
 
 
 
 for image in `talosctl image default`; do \
-    docker tag $image `echo $image | sed -E 's#^[^/]+/#ccesregistry01.azurecr.io/#'`; \
+    nerdctl tag $image `echo $image | sed -E 's#^[^/]+/#ccesregistry01.azurecr.io/#'`; \
 	done
 
 for image in `talosctl image default`; do \
-    docker push `echo $image | sed -E 's#^[^/]+/#ccesregistry01.azurecr.io/#'`; \
+    nerdctl push `echo $image | sed -E 's#^[^/]+/#ccesregistry01.azurecr.io/#'`; \
     done
 
 
@@ -278,9 +281,9 @@ kubectl rollout undo deployment/my-deployment
 Configuring Applications
 
 ```
-docker run ubuntu
-docker build -t ubuntu-sleeper .
-docker run ubuntu-sleeper
+nerdctl run ubuntu
+nerdctl build -t ubuntu-sleeper .
+nerdctl run ubuntu-sleeper
 
 ```
 
@@ -472,7 +475,7 @@ Networking
   iptables -t nat -A PREROUTING --dport 80 --to-destination 192.168.15.2:80 -j DNAT
   ```
 
-  - Docker Networking
+  - nerdctl Networking
   
   - CNI
   
@@ -500,7 +503,7 @@ Deploying a high availability Kubernetes cluster running the Rocket.Chat applica
 - **Cluster Federation**: Set up Kubernetes federation or use multi-cluster management tools (e.g., Rancher, Anthos) to manage the clusters across the data centers.
 
 ### 4. **Rocket.Chat Deployment**
-- **Containerization**: Create Docker images for Rocket.Chat and its dependencies (e.g., MongoDB).
+- **Containerization**: Create nerdctl images for Rocket.Chat and its dependencies (e.g., MongoDB).
 - **Helm Charts**: Use Helm charts to define and deploy Rocket.Chat applications across the Kubernetes clusters.
 - **Persistent Storage**: Configure persistent storage solutions (e.g., NFS, Ceph) to ensure data availability across the clusters.
 
@@ -538,8 +541,8 @@ raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resource
 github.com/projectcalico/calico/releases/download/v3.29.1/calicoctl-linux-amd64
 downloads.tigera.io/ee/binaries/v3.19.4/calicoctl
 pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
-download.docker.com/linux/ubuntu/gpg
-download.docker.com/linux/ubuntu
+download.nerdctl.com/linux/ubuntu/gpg
+download.nerdctl.com/linux/ubuntu
 ```
 
 ---
@@ -714,25 +717,25 @@ sysctl --system
 
 13. Installing Containerd container runtime
 
-setup Docker’s apt repository
+setup nerdctl’s apt repository
 
 ```apt update
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+curl -fsSL https://download.nerdctl.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/nerdctl.gpg
 ```
 
 Add the repository to Apt sources:
 
 ```
-deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable
+deb [arch=amd64 signed-by=/etc/apt/keyrings/nerdctl.gpg] https://download.nerdctl.com/linux/ubuntu noble stable
 ```
 
 or this way:
 		
 ```
 echo \
-"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/nerdctl.gpg] https://download.nerdctl.com/linux/ubuntu \
 $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-tee /etc/apt/sources.list.d/docker.list /dev/null
+tee /etc/apt/sources.list.d/nerdctl.list /dev/null
 ```
 
 install containerd
@@ -904,7 +907,7 @@ Applications to be added or migrated to Kubernetes
 
 Unifi controller on kubernetes
 
-	https://medium.com/@reefland/migrating-unifi-network-controller-from-docker-to-kubernetes-5aac8ed8da76
+	https://medium.com/@reefland/migrating-unifi-network-controller-from-nerdctl-to-kubernetes-5aac8ed8da76
 	https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
 
 Load balancing
