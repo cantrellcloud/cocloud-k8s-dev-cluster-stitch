@@ -477,24 +477,37 @@ Networking
 
   - nerdctl Networking
   
+  nerdctl network create -d macvlan \
+  --subnet=10.0.69.224/27 \
+  --gateway=10.0.69.225 \
+  -o parent=eth1 \
+  unifi
+  
+  
   - CNI
   
-  '/opt/cni/bin'
+  `/opt/cni/bin`
   
-  '/etc/cni'
+  `/etc/cni`
   
-  'ps -aux | grep kubelet | grep --color container-runtime-endpoint'
+  `ps -aux | grep kubelet | grep --color container-runtime-endpoint`
   
-  kubectl logs -n kube-system
+  `kubectl logs -n kube-system`
   
 
   - Ingress
-  
   Nginx is part of Kube project
   
+  get ingress resources
+  `kubectl get ingress -A`
+
+  create a namespace
+  `kubectl create ns ingress-nginx`
   
+  create configmap
+  `kubectl create configmap ingress-nginx-controller -ns ingress-nginx`
 
-
+  
 
 Deploying a high availability Kubernetes cluster running the Rocket.Chat application across three data centers involves several key milestones. Here’s a high-level overview:
 
@@ -725,6 +738,9 @@ sysctl --system
 ```
 
 13. Installing Containerd container runtime
+https://github.com/containerd/nerdctl
+https://github.com/containerd/containerd/blob/main/docs/getting-started.md
+
 
 setup nerdctl’s apt repository
 
