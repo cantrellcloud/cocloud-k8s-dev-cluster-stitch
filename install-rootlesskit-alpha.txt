@@ -1,0 +1,37 @@
+
+install rootlesskit - run as non-root user on k8s-controllers
+
+```
+sudo tee /etc/sysctl.d/99-rootless.conf <<EOF
+kernel.unprivileged_userns_clone=1
+EOF
+
+sudo sysctl --system
+
+sudo apt-get install -y uidmap
+sudo apt-get install slirp4netns
+
+mkdir -p ~/bin
+curl -sSL https://github.com/rootless-containers/rootlesskit/releases/download/v2.3.2/rootlesskit-aarch64.tar.gz | tar Cxzv ~/bin
+
+sudo mkdir /opt/cni/bin -p
+wget https://github.com/containernetworking/plugins/releases/download/v1.6.2/cni-plugins-linux-amd64-v1.6.2.tgz
+sudo tar xzf cni-plugins-linux-amd64-v1.6.2.tgz -C /opt/cni/bin
+
+containerd-rootless-setuptool.sh install
+```
+
+Add the repository to Apt sources:
+
+```
+deb [arch=amd64 signed-by=/etc/apt/keyrings/nerdctl.gpg] https://download.nerdctl.com/linux/ubuntu noble stable
+```
+
+or this way:
+		
+```
+echo \
+"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/nerdctl.gpg] https://download.nerdctl.com/linux/ubuntu \
+$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+tee /etc/apt/sources.list.d/nerdctl.list /dev/null
+```

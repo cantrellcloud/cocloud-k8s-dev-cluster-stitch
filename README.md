@@ -507,6 +507,12 @@ Networking
   create configmap
   `kubectl create configmap ingress-nginx-controller -ns ingress-nginx`
 
+  create service accounts
+  `kubectl create serviceaccount ingress-nginx --namespace ingress-nginx` and
+  `kubectl create serviceaccount ingress-nginx-admission --namespace ingress-nginx`
+  
+  apply ingress-controller.yaml configureation
+  
   
 
 Deploying a high availability Kubernetes cluster running the Rocket.Chat application across three data centers involves several key milestones. Here’s a high-level overview:
@@ -578,39 +584,98 @@ The product_uuid can be checked by using the command
 
 ```
 cat /sys/class/dmi/id/product_uuid
+apt install vim
 ```
 
-2. Update hosts file on hosts
+2. Network Configuration
+
+Set Interfaces - only if required
+
+```
+# The following will replace current network configuration
+# Be sure to change required data before running tee command
+
+tee /etc/netplan/50-cloud-init.yaml <<EOF
+network:
+    ethernets:
+        eth0:
+            addresses:
+            - 10.0.69.51/27
+            nameservers:
+                addresses:
+                - 172.16.69.71
+                - 172.16.69.72
+                search:
+                - cantrellcloud.net
+                - cantrelloffice.cloud
+                - cantrell.cloud
+            routes:
+            -   to: default
+                via: 10.0.69.33
+        eth1: {}
+    version: 2
+    vlans:
+        eth1.10:
+            id: 10
+            link: eth1
+        eth1.101:
+            id: 101
+            link: eth1
+EOF
+
+netplan try
+```
+
+Set NTP Client
+
+```
+# The following will replace current network configuration
+
+tee /etc/systemd/timesyncd.conf <<EOF
+[Time]
+NTP=time.cantrelloffice.cloud
+EOF
+
+systemctl restart systemd-timesyncd
+wait 1500
+timedatectl timesync-status
+```
+
+Update hosts File
 
 ```
 vi /etc/hosts
 ```
 
 ```
-10.0.69.41 k8dev-adm01.k8s.cantrellcloud.net
-10.0.69.42 k8dev-wkr01.k8s.cantrellcloud.net
-10.0.69.43 k8dev-wkr02.k8s.cantrellcloud.net
-
-10.0.69.50 k8prd-lb.k8s.cantrellcloud.net
-10.0.69.51 k8prd-adm01.k8s.cantrellcloud.net
-10.0.69.52 k8prd-adm02.k8s.cantrellcloud.net
-10.0.69.53 k8prd-wkr01.k8s.cantrellcloud.net
-10.0.69.54 k8prd-wkr02.k8s.cantrellcloud.net
-
-172.16.69.41 copine-k8adm01.cantrellcloud.net
-172.16.69.51 copine-k8nod01.cantrellcloud.net
-172.16.69.52 copine-k8nod02.cantrellcloud.net
+10.0.69.50 kube01.cantrellcloud.net
+10.0.69.51 kubectrl01.cantrellcloud.net
+10.0.69.52 kubectrl02.cantrellcloud.net
+10.0.69.53 kubework01.cantrellcloud.net
+10.0.69.54 kubework02.cantrellcloud.net
 ```
 
-3. Turn off swap
+3. Disable systemd-networkd-wait-online
+
+```
+/lib/systemd/system/systemd-networkd-wait-online.service
+
+ # add TimeoutStartSec=5sec under the [Service] section, e.g.:
+
+[Service]
+Type=oneshot
+ExecStart=/lib/systemd/systemd-networkd-wait-online
+RemainAfterExit=yes
+TimeoutStartSec=5sec
+```
+
+4. Turn off swap now and make persistent across reboots
 
 ```
 swapoff-a
 ```
 
-4. Turn off swap persistent across reboots
-
-Disable swap in --/etc/fstab
+Make Persistent across reboot; look for swap in --/etc/fstab and put a # in front of it
 
 ```
 vi /etc/fstab
@@ -618,15 +683,12 @@ vi /etc/fstab
 
 5. Update apt index and install packages for kubernetes
 
-```apt-get update
+```
+apt-get update
 apt-get install -y apt-transport-https ca-certificates curl gpg net-tools gnupg
 ```
 
 6. Download public signing key for kubernetes repositories
-
-If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command
-
-- `mkdir -p -m 755 /etc/apt/keyrings`
 
 ```
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
@@ -661,7 +723,7 @@ systemctl enable --now kubelet
 enable firewall and add rules
 
 ```
-ufw enable
+apt install -y ufw
 ```
 
 Control Plane rules
@@ -688,23 +750,22 @@ ufw allow 10256/tcp
 ufw allow 30000:32767/tcp
 ```
 
+```
+ufw enable
+```
+
 check firewall status
 
 ```
 ufw status verbose
 ```
 
-11. add command line aliases for frequently used commands
-
-edit command alias file
-
-```
-vi ~/.bash_aliases
-```
+11. add command line aliases for frequently used commands (non-root user)
 
 add aliases and make active
 
 ```
+tee ~/.bash_aliases <<EOF
 alias k=kubectl
 alias kg='kubectl get'
 alias kd='kubectl describe'
@@ -714,6 +775,14 @@ alias kl='kubectl logs'
 alias kgall='kubectl get all -A'
 alias ktn='kubectl top node'
 alias ktp='kubectl top pod'
+alias n=nerdctl
+alias nil='nerdctl image ls'
+alias ncl='nerdctl container ls'
+alias nirm='nerdctl image rm'
+alias ncrm='nerdctl container rm'
+alias ncstart='nerdctl container start'
+alias ncstop='nerdctl container stop'
+EOF
 
 source ~/.bash_aliases
 ```
@@ -744,42 +813,65 @@ https://github.com/containerd/containerd/blob/main/docs/getting-started.md
 
 setup nerdctl’s apt repository
 
-```apt update
-curl -fsSL https://download.nerdctl.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/nerdctl.gpg
+download nerdctl binaries
+```
+cd $HOME
+wget https://github.com/containerd/nerdctl/releases/download/v2.0.2/nerdctl-2.0.2-linux-amd64.tar.gz
 ```
 
-Add the repository to Apt sources:
+extract nerdctl binaries - only on k8s-controllers
 
 ```
-deb [arch=amd64 signed-by=/etc/apt/keyrings/nerdctl.gpg] https://download.nerdctl.com/linux/ubuntu noble stable
+tar Cxzvvf /usr/local/bin nerdctl-2.0.2-linux-amd64.tar.gz
 ```
 
-or this way:
-		
+enable/confirm cgroup v2
+
 ```
-echo \
-"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/nerdctl.gpg] https://download.nerdctl.com/linux/ubuntu \
-$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-tee /etc/apt/sources.list.d/nerdctl.list /dev/null
+cat /etc/default/grub | grep systemd.unified_cgroup_hierarchy
+```
+
+enable non-root cpu, cpuset, and i/o delegation - run as non-root user on k8s-controllers
+
+```
+sudo mkdir -p /etc/systemd/system/user@.service.d
+cat <<EOF | sudo tee /etc/systemd/system/user@.service.d/delegate.conf
+[Service]
+Delegate=cpu cpuset io memory pids
+EOF
+sudo systemctl daemon-reload
+
+cat /sys/fs/cgroup/user.slice/user-$(id -u).slice/user@$(id -u).service/cgroup.controllers  - run as non-root user on k8s-controllers
 ```
 
 install containerd
 
+follow this for now: https://github.com/containerd/containerd/blob/main/docs/getting-started.md
+
 ```
-apt update
-apt install containerd.io -y
+tar Cxzvf /usr/local containerd-x.x.x-linux-amd64.tar.gz
+
+sudo install -m 755 runc.amd64 /usr/local/sbin/runc
+
+mkdir -p /opt/cni/bin
+sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.1.1.tgz
+
+sudo cp containerd.service /usr/local/lib/systemd/system/
+
+systemctl daemon-reload
+systemctl enable --now containerd
 ```
 
-configure the system so it starts using systemd as cgroup
+configure the system so it starts using systemd as cgroup - still need to work on this
 
 ```
 containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1
 ```
 
-verify containerd config file
+verify containerd config file - still need to work on this
 
 ```
-vi /etc/containerd/config.toml
+cat /etc/containerd/config.toml
 ```
 
 > ...
@@ -796,7 +888,7 @@ systemctl status containerd
 
 14. Pull kubeadm config images and initialize default configuration
 
-pull kubeadm default config
+pull kubeadm default config - only on one of the controllers
 
 ```
 sysctl --system
@@ -818,19 +910,27 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-15. Modify the kubelet ConfigMap
+15. Modify the kubelet
 
+ConfigMap
 Should be set, run command to verify cgroupDriver: systemd
 
 ```
 kubectl edit cm kubelet-config -n kube-system
 ```
 
+Labels
+
+```
+kubectl label node kubectrl02 node-role.kubernetes.io/control-plane=
+kubectl label node kubework01 node-role.kubernetes.io/worker=
+```
+
 16. Install Calico network overlay
 
 ```
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
-curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml -O
+curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml
 kubectl create -f custom-resources.yaml
 ```
 
