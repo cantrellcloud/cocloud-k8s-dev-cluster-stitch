@@ -513,9 +513,132 @@ Networking
   
   apply ingress-controller.yaml configureation
   
+Security
+
+ - Enable SSH based authentication
+ 
+  Certificates used by Kubernetes
+
+  ```
+  
+  ```
+
+   
+  Certificate Authority
+
+  - ca
+
+  ```
+  openssl genrsa -out devca.key
+  openssl req -new -key devca.key -subj "/CN=Cantrell Cloud Kubernetes CA" -out devca.csr
+  
+  sign the csr with Cantrell Cloud Signing CA
+  ```
+   
+  Client Certs
+
+  - admin
+
+  ```
+  openssl genrsa -out devadmin.key
+  openssl req -new -key devadmin.key -subj "/CN=kube-admin/O=system:masters" -out devadmin.csr
+  openssl x509 -req -in devadmin.csr -CA devca.crt -CAkey devca.key -out devadmin.crt
+  ```
+  
+  - scheduler
+
+  ```
+  openssl genrsa -out devscheduler.key
+  openssl req -new -key devscheduler.key -subj "/CN=system:kube-scheduler" -out devscheduler.csr
+  openssl x509 -req -in devscheduler.csr -CA devca.crt -CAkey devca.key -out devscheduler.crt
+  ```
+  
+  - controller-manager
+
+  ```
+  openssl genrsa -out devcontrollermanager.key
+  openssl req -new -key devcontrollermanager.key -subj "/CN=system:kube-controller-manager" -out devcontrollermanager.csr
+  openssl x509 -req -in devcontrollermanager.csr -CA devca.crt -CAkey devca.key -out devcontrollermanager.crt
+  ```
+  
+  - kube-proxy
+
+  ```
+  openssl genrsa -out devkubeproxy.key
+  openssl req -new -key devkubeproxy.key -subj "/CN=system:kube-proxy" -out devkubeproxy.csr
+  openssl x509 -req -in devkubeproxy.csr -CA devca.crt -CAkey devca.key -out devkubeproxy.crt
+  ```
+  
+  - apiserver-kublet-client
+
+  ```
+  openssl genrsa -out devapikubeletclient1.key
+  openssl req -new -key devapikubeletclient1.key -subj "/CN=system:node:kubectrl01/O=system:nodes" -out devapikubeletclient1.csr
+  openssl x509 -req -in devapikubeletclient1.csr -CA devca.crt -CAkey devca.key -out devapikubeletclient1.crt
+  
+  openssl genrsa -out devapikubeletclient1.key
+  openssl req -new -key devapikubeletclient1.key -subj "/CN=system:node:kubectrl01/O=system:nodes" -out devapikubeletclient1.csr
+  openssl x509 -req -in devapikubeletclient1.csr -CA devca.crt -CAkey devca.key -out devapikubeletclient1.crt
+  
+  
+  ```
+  
+  - apiserver-etcd-client
+
+  ```
+  openssl genrsa -out devadmin.key
+  openssl req -new -key devadmin.key -subj "/CN=kube-admin/O=system:masters" -out devadmin.csr
+  openssl x509 -req -in devadmin.csr -CA devca.crt -CAkey devca.key -out devadmin.crt
+  ```
+  
+  - kubelet-client
+
+  ```
+  openssl genrsa -out devadmin.key
+  openssl req -new -key devadmin.key -subj "/CN=kube-admin/O=system:masters" -out devadmin.csr
+  openssl x509 -req -in devadmin.csr -CA devca.crt -CAkey devca.key -out devadmin.crt
+  ```
   
 
-Deploying a high availability Kubernetes cluster running the Rocket.Chat application across three data centers involves several key milestones. Here’s a high-level overview:
+  Server Certs
+  - apiserver
+
+  ```
+  openssl genrsa -out devapiserver.key
+  openssl req -new -key devapiserver.key -subj "/CN=kube-apiserver" -out devapiserver.csr
+  
+  use an openssl config file to set the SANs
+  
+  openssl x509 -req -in devapiserver.csr -CA devca.crt -CAkey devca.key -out devapiserver.crt
+  ```
+  
+  - etcdserver
+
+  ```
+  openssl genrsa -out devetcdserver.key
+  openssl req -new -key devetcdserver.key -subj "/CN=etcd-server" -out devetcdserver.csr
+  openssl x509 -req -in devetcdserver.csr -CA devca.crt -CAkey devca.key -out devetcdserver.crt
+  ```
+  
+  - kubelet
+
+  ```
+  openssl genrsa -out devkublet1.key
+  openssl req -new -key devkublet1.key -subj "/CN=kubectrl01" -out devkublet1.csr
+  openssl x509 -req -in devkublet1.csr -CA devca.crt -CAkey devca.key -out devkublet1.crt
+  
+  openssl genrsa -out devkublet2.key
+  openssl req -new -key devkublet2.key -subj "/CN=kubectrl02" -out devkublet2.csr
+  openssl x509 -req -in devkublet2.csr -CA devca.crt -CAkey devca.key -out devkublet2.crt
+  
+  continue making kublet certs for all nodes in the cluster
+  ```
+  
+  
+
+
+
+## Deploying a high availability Kubernetes cluster running the Rocket.Chat application across three data centers involves several key milestones. Here’s a high-level overview:
 
 ### 1. **Planning and Design**
 - **Requirements Gathering**: Identify the hardware, software, and network requirements.
