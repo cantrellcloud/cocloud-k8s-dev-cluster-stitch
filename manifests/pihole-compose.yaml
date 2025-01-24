@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    environment:
+      TZ: 'America/New_York'  # Set your timezone
+      WEBPASSWORD: 'your_password'  # Set a password for the web interface
+    volumes:
+      - './etc-pihole:/etc/pihole'
+      - './etc-dnsmasq.d:/etc/dnsmasq.d'
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "80:80/tcp"
+      - "443:443/tcp"
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+
+networks:
+  default:
+    external:
+      name: your_network_name  # Use your existing network name
