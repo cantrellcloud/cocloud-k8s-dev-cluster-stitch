@@ -517,7 +517,6 @@ Security
 
  - Enable SSH based authentication
  
-  Certificates used by Kubernetes
 
   ```
   
@@ -526,20 +525,9 @@ Security
    
   Certificate Authority
 
-  - ca
+  - ## Create Kubernetes Certificate Authority and Generate Certificates
 
   ```
-  openssl genrsa -out devca.key
-  openssl req -new -key devca.key -subj "/CN=Cantrell Cloud Kubernetes CA" -out devca.csr
-  
-  sign the csr with Cantrell Cloud Signing CA
-  ```
-  
-  self-signed method
-
-  ```
-  ## Create Kubernetes Certificate Authority and Generate Certificates
-
   sudo -i
   mkdir /opt/ca
   mkdir /opt/ca/certs
@@ -576,6 +564,17 @@ Security
   cat /opt/certs/offline-registry.crt \
   /opt/ca/cacert.pem > \
   /opt/ca/certs/offline-registry-chained.crt
+  ```
+  
+  Certificates used by Kubernetes
+
+  - ca
+
+  ```
+  openssl genrsa -out devca.key
+  openssl req -new -key devca.key -subj "/CN=Cantrell Cloud Kubernetes CA" -out devca.csr
+  
+  sign the csr with Cantrell Cloud Signing CA
   ```
   
   Client Certs
