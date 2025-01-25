@@ -8,6 +8,8 @@ services:
       FTLCONF_LOCAL_IPV4: 127.0.0.1 # Set Pihole server IP to localhost. Remove if using separate IP
       PIHOLE_DNS_: 4.2.2.2
       DHCP_ACTIVE: "false"
+      PIHOLE_DOMAIN: dev.local
+      WEBTHEME: "default-dark"
     volumes:
       - './etc-pihole:/etc/pihole'
       - './etc-dnsmasq.d:/etc/dnsmasq.d'

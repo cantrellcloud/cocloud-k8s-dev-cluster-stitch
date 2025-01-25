@@ -634,6 +634,14 @@ Security
   continue making kublet certs for all nodes in the cluster
   ```
   
+  - certificate discovery
+  
+  ```
+  Run crictl ps -a command to identify the kube-api server container.
+  Run crictl logs container-id command to view the logs.
+  ```
+  
+  
   
 
 
