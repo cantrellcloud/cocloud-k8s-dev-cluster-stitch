@@ -534,7 +534,50 @@ Security
   
   sign the csr with Cantrell Cloud Signing CA
   ```
-   
+  
+  self-signed method
+
+  ```
+  ## Create Kubernetes Certificate Authority and Generate Certificates
+
+  sudo -i
+  mkdir /opt/ca
+  mkdir /opt/ca/certs
+  mkdir /opt/ca/crl
+  mkdir /opt/ca/newcerts
+  mkdir /opt/ca/private
+  mkdir /opt/ca/requests
+  touch /opt/ca/index.txt
+  echo '1000' /opt/ca/serial
+  chmod 600 /opt/ca
+  cd /opt/ca
+  openssl genrsa -aes256 -out private/cakey.pem 4096
+  openssl req -new -x509 -key /opt/ca/cakey.pem -out cacert.pem -days 3650
+  vi /usr/lib/ssl/openssl.cnf # [CA_default] dir = /opt/ca # Where everything is kept
+  cd /opt/requests
+
+  # create certificate request
+  openssl req 
+   -out offline-registry.csr 
+   -newkey rsa:2048 
+   -nodes 
+   -keyout /opt/ca/private/offline-registry-key.pem 
+   -extensions req_ext 
+   -config offline-registry-san.cnf
+
+  # get certificate request signed by CA
+  openssl ca \
+   -in offline-registry.csr \
+   -out offline-registry.crt \
+   -extensions req_ext \
+   -extfile offline-registry-san.cnf
+
+  # merge server.crt and cacert.pem
+  cat /opt/certs/offline-registry.crt \
+  /opt/ca/cacert.pem > \
+  /opt/ca/certs/offline-registry-chained.crt
+  ```
+  
   Client Certs
 
   - admin
