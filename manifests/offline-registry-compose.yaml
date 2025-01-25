@@ -1,0 +1,16 @@
+services:
+  pihole:
+    image: registry:2
+    container_name: offline-registry
+    hostname: offline-registry
+    environment:
+      REGISTRY_HTTP_ADDR: 0.0.0.0:443
+      REGISTRY_HTTP_TLS_CERTIFICATE: ./certs/offline-registry-chained.crt
+      REGISTRY_HTTP_TLS_KEY: ./certs/offline-registry.key
+    volumes:
+      - './certs:/certs'
+      - './data/var-lib-registry:/var/lib/registry'
+    ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
+    restart: unless-stopped
