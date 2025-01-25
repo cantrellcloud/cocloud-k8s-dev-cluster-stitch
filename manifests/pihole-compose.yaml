@@ -27,3 +27,27 @@ networks:
   default:
     external:
       name: your_network_name  # Use your existing network name
+
+services:
+  pihole:
+    image: pihole/pihole:2024.07.0
+    container_name: pihole-bhn
+    hostname: pihole-bhn
+    environment:
+      TZ: 'America/New_York'
+      WEBPASSWORD: 'S1airarose!895'
+      FTLCONF_LOCAL_IPV4: 127.0.0.1
+      PIHOLE_DNS_: 4.2.2.2
+      DHCP_ACTIVE: "false"
+      PIHOLE_DOMAIN: dev.local
+      WEBTHEME: "default-dark"
+    volumes:
+      - './etc-pihole:/etc/pihole'
+      - './etc-dnsmasq.d:/etc/dnsmasq.d'
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8080:80/tcp"
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
