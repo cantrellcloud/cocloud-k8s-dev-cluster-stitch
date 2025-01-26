@@ -496,7 +496,18 @@ Networking
   
 
   - Ingress
+
   Nginx is part of Kube project
+  
+    - If you have Helm, you can deploy the ingress controller with the following command:
+
+  helm upgrade --install ingress-nginx ingress-nginx \
+    --repo https://kubernetes.github.io/ingress-nginx \
+    --namespace ingress-nginx --create-namespace
+
+  It will install the controller in the ingress-nginx namespace, creating that namespace if it doesn't already exist.
+  
+    - To deploy with apt-update
   
   get ingress resources
   `kubectl get ingress -A`
@@ -750,7 +761,15 @@ download.nerdctl.com/linux/ubuntu/gpg
 download.nerdctl.com/linux/ubuntu
 ```
 
----
+## Install Helm
+
+  ```
+  curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+  apt-get install apt-transport-https --yes
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+  apt-get update
+  apt-get install helm
+  ```
 
 ## Install Linux Integration Services (Hyper-V Tools)
 
@@ -759,7 +778,7 @@ echo 'hv_vmbus' >> /etc/initramfs-tools/modules
 echo 'hv_storvsc' >> /etc/initramfs-tools/modules
 echo 'hv_blkvsc' >> /etc/initramfs-tools/modules
 echo 'hv_netvsc' >> /etc/initramfs-tools/modules
-apt -y install linux-virtual linux-cloud-tools-virtual linux-tools-virtual
+apt update && apt upgrade -y && apt -y install linux-virtual linux-cloud-tools-virtual linux-tools-virtual
 update-initramfs -u
 reboot
 ```
