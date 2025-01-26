@@ -684,7 +684,11 @@ Security
   ```
   
   
+  - KubeConfig
   
+  ```
+  
+  ```
 
 
 
@@ -747,6 +751,18 @@ download.nerdctl.com/linux/ubuntu
 ```
 
 ---
+
+## Install Linux Integration Services (Hyper-V Tools)
+
+```
+echo 'hv_vmbus' >> /etc/initramfs-tools/modules
+echo 'hv_storvsc' >> /etc/initramfs-tools/modules
+echo 'hv_blkvsc' >> /etc/initramfs-tools/modules
+echo 'hv_netvsc' >> /etc/initramfs-tools/modules
+apt -y install linux-virtual linux-cloud-tools-virtual linux-tools-virtual
+update-initramfs -u
+reboot
+```
 
 ### Kubernetes cluster system configuation and initialization
 
