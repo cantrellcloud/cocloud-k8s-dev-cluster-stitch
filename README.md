@@ -771,6 +771,48 @@ download.nerdctl.com/linux/ubuntu
   apt-get install helm
   ```
 
+### Install Helm Charts
+
+  - Pi-Hole helm chart
+  
+  ```
+  helm repo add mojo2600 https://mojo2600.github.io/pihole-kubernetes/
+  helm upgrade -i pihole mojo2600/pihole -f values-pihole.yaml
+  ```
+
+## Install NFS Shares
+
+  - On NFS Export server
+  
+  ```
+  apt-get install nfs-kernel-server -y
+  mkdir -p /opt/nfsshares
+  mkdir -p /srv/nfs4/nfsshares
+  mount --bind /opt/nfsshares /srv/nfs4/nfsshares
+  vi /etc/fstab
+    /opt/nfsshares /srv/nfs4/nfsshares none bind 0 0
+  vi /etc/exports
+    /shared/folder *(rw,no_root_squash,insecure,async,no_subtree_check,anonuid=1000,anongid=1000)
+  exportfs -ar
+  exportfs -v
+  ufw allow 2049/tcp
+  ufw allow 2049/udp
+  reboot
+  ```
+  
+  - On each Worker Node
+  
+  ```
+  apt-get install nfs-common -y
+  mkdir /opt/nfsshares
+  mount -t nfs -o vers=4 10.0.69.41:/srv/nfs4/nfsshares /opt/nfsshares
+  df -h
+  vi /etc/fstab
+    10.0.69.41:/srv/nfs4/nfsserver /opt/nfsshares nfs defaults,timeo=900,retrans=5,_netdev 0 0
+  reboot
+  ```
+
+
 ## Install Linux Integration Services (Hyper-V Tools)
 
 ```
@@ -799,7 +841,7 @@ apt install vim
 
 Set Interfaces - only if required
 
-```
+```xxxxxxxxxxx
 # The following will replace current network configuration
 # Be sure to change required data before running tee command
 
