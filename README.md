@@ -692,6 +692,9 @@ Security
   ```
   Run crictl ps -a command to identify the kube-api server container.
   Run crictl logs container-id command to view the logs.
+  
+  kubectl get csr
+  kubectl certificate approve <csr-name>
   ```
   
   
