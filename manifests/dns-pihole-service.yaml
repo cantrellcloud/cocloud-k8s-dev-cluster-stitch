@@ -1,8 +1,32 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pihole-etc-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pihole-dnsmasq-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pihole-pods
-  namespace: dns-pihole
+  name: pihole
+  labels:
+    app: pihole
 spec:
   replicas: 1
   selector:
@@ -12,35 +36,50 @@ spec:
     metadata:
       labels:
         app: pihole
+        name: pihole
     spec:
       containers:
-      - name: pihole
-        image: pihole/pihole:latest
-        ports:
-        - containerPort: 80
+        - name: copine-pihole01
+          image: pihole/pihole:v5.18.4
+          env:
+            - name: TZ
+              value: 'America/New_York'
+            - name: WEBPASSWORD
+              value: 'S1airarose!895'
+            - name: DNS1
+              value: '4.2.2.2'
+            - name: DNS2
+              value: '1.1.1.1'
+          volumeMounts:
+            - name: pihole-local-etc-volume
+              mountPath: '/etc/pihole'
+            - name: pihole-local-dnsmasq-volume
+              mountPath: '/etc/dnsmasq.d'
+      volumes:
+        - name: pihole-local-etc-volume
+          persistentVolumeClaim:
+            claimName: pihole-etc-pv-claim
+        - name: pihole-local-dnsmasq-volume
+          persistentVolumeClaim:
+            claimName: pihole-dnsmasq-pv-claim
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: pihole-service
-  namespace: dns-pihole
+  name: pihole
 spec:
-  clusterIP: 10.96.212.110
-  clusterIPs:
-    - 10.96.212.110
-  externalTrafficPolicy: Cluster
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-    - IPv4
-  ipFamilyPolicy: SingleStack
-  ports:
-  - nodePort: 30080
-    port: 80
-    protocol: TCP
-    targetPort: 80
   selector:
-      name: pihole
-  sessionAffinity: None
-  type: NodePort
-status:
-  loadBalancer: {}
+    app: pihole
+  clusterIP: 10.96.212.110
+  ports:
+    - port: 80
+      targetPort: 80
+      name: pihole-admin
+    - port: 53
+      targetPort: 53
+      protocol: TCP
+      name: dns-tcp
+    - port: 53
+      targetPort: 53
+      protocol: UDP
+      name: dns-udp
