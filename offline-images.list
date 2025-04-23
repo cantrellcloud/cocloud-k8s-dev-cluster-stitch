@@ -4,6 +4,7 @@ docker.io/antrea/antrea-agent-ubuntu:v2.3.0
 docker.io/antrea/antrea-controller-ubuntu:v2.3.0
 docker.io/bitnami/bitnami-shell:11-debian-11-r45
 docker.io/bitnami/kubectl:1.32.3-debian-12-r4
+docker.io/bitnami/mongodb:8.0.6-debian-12r1
 docker.io/bitnami/mongodb:8.0.6-debian-12-r1
 docker.io/bitnami/mongodb:8.0.8-debian-12-r0
 docker.io/bitnami/mongodb-exporter:0.44.0-debian-12-r3
@@ -58,6 +59,7 @@ docker.io/postgres:16.6
 docker.io/postgres:17.2
 docker.io/prom/prometheus:v3.1.0
 docker.io/registry:2
+docker.io/registry:3
 docker-registry.nginx.com/nsm/nginx-mesh-cert-reloader:2.0.0
 docker-registry.nginx.com/nsm/nginx-mesh-controller:2.0.0
 docker-registry.nginx.com/nsm/nginx-mesh-init:2.0.0
@@ -92,6 +94,14 @@ quay.io/jetstack/cert-manager-startupapicheck:v1.17.1
 quay.io/jetstack/cert-manager-webhook:v1.17.1
 quay.io/metallb/controller:v0.14.9
 quay.io/metallb/speaker:v0.14.9
+quay.io/mongodb/mongodb-agent-ubi:108.0.6.8796-1
+quay.io/mongodb/mongodb-community-server:7.0.1-ubi8
+quay.io/mongodb/mongodb-community-server:7.0.19-ubi8
+quay.io/mongodb/mongodb-community-server:8.0.8-ubi8
+quay.io/mongodb/mongodb-community-server:8.0.8-ubi9
+quay.io/mongodb/mongodb-kubernetes-operator:0.13.0
+quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.10
+quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.23
 quay.io/tigera/operator:v1.36.2
 quay.io/tigera/operator:v1.36.5
 registry.k8s.io/autoscaling/addon-resizer:1.8.21
@@ -124,6 +134,12 @@ registry.k8s.io/kube-scheduler:v1.32.1
 registry.k8s.io/kube-scheduler:v1.32.2
 registry.k8s.io/metrics-server:v0.3.6
 registry.k8s.io/pause:3.10
+registry.k8s.io/netapp/csi-attacher:v4.8.0
+registry.k8s.io/netapp/csi-node-driver-registrar:v2.13.0
+registry.k8s.io/netapp/csi-provisioner:v5.2.0
+registry.k8s.io/netapp/csi-resizer:v1.13.1
+registry.k8s.io/netapp/csi-resizer:v1.13.2
+registry.k8s.io/netapp/csi-snapshotter:v8.2.0
 registry.k8s.io/sig-storage/csi-attacher:v4.8.0
 registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.13.0
 registry.k8s.io/sig-storage/csi-provisioner:v5.2.0
@@ -131,3 +147,4 @@ registry.k8s.io/sig-storage/csi-resizer:v1.13.1
 registry.k8s.io/sig-storage/csi-resizer:v1.13.2
 registry.k8s.io/sig-storage/csi-snapshotter:v8.2.0
 registry.rocket.chat/rocketchat/rocket.chat:7.2.1
+registry.rocket.chat/rocketchat/rocket.chat:7.5.1
