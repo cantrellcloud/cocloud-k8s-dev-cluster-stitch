@@ -160,3 +160,5 @@ docker.io/bitnami/harbor-registry:2.13.0-debian-12-r2
 docker.io/bitnami/harbor-registryctl:2.13.0-debian-12-r4
 docker.io/bitnami/harbor-adapter-trivy:2.13.0-debian-12-r2
 docker.io/bitnami/harbor-exporter:2.13.0-debian-12-r3
+docker.io/bitnami/postgresql:17.4.0-debian-12-r17
+docker.io/bitnami/redis:7.4.3-debian-12-r0
