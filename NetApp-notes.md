@@ -1,6 +1,11 @@
 # NetApp-notes
 
 ```bash
+#----kubectl node-shell
+curl -LO https://github.com/kvaps/kubectl-node-shell/raw/master/kubectl-node_shell
+```
+
+```bash
 NAMESPACE=svc-contour-domain-c45722
 kubectl get namespace svc-contour-domain-c45722 -o json |jq '.spec = {"finalizers":[]}' >temp.json
 curl -k -H "Content-Type: application/json" -X PUT --data-binary @temp.json 127.0.0.1:8001/api/v1/namespaces/svc-contour-domain-c45722/finalize
@@ -82,6 +87,34 @@ Tanzu makes it kind of a pain compared to other k8s distros where I'd just throw
 Just need whatever domain you use for the worker nodes to be set on the nfsv4iddomain on the netapp.
 
 https://docs.netapp.com/us-en/ontap/nfs-admin/specify-user-id-domain-nfsv4-task.html
+
+```yaml
+kind: KubeadmConfigTemplate 
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+metadata:
+  name: tkgs-workers-with-idmapd
+spec:
+  template:
+    spec:
+      files:
+      - path: /etc/idmapd.conf
+        owner: root:root
+        permissions: "0644"
+        content: |
+          [General]
+          Domain=dev.kube
+      preKubeadmCommands:
+      - systemctl restart nfs-idmapd || true
+```
+
+```bash
+tee /etc/idmapd.conf << EOF 
+[General]
+Domain = dev.kube
+Local-Realms = DEV.KUBE, DEV.LOCAL
+EOF
+nfsidmap -c
+```
 
 https://kb.netapp.com/on-prem/ontap/da/NAS/NAS-KBs/What_is_an_NFS_-v4-domain-id
 
