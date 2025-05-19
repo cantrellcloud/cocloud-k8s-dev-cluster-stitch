@@ -122,8 +122,11 @@ quay.io/jetstack/cert-manager-webhook:v1.17.1
 quay.io/metallb/controller:v0.14.9
 quay.io/metallb/speaker:v0.14.9
 quay.io/mongodb/mongodb-agent-ubi:108.0.6.8796-1
-quay.io/mongodb/mongodb-community-server:7.0.19-ubi8
+quay.io/mongodb/mongodb-community-server:5.0.23-ubi8
+quay.io/mongodb/mongodb-community-server:6.0.13-ubi8
 quay.io/mongodb/mongodb-community-server:7.0.1-ubi8
+quay.io/mongodb/mongodb-community-server:7.0.19-ubi8
+quay.io/mongodb/mongodb-community-server:7.0.20-ubi8
 quay.io/mongodb/mongodb-community-server:8.0.8-ubi8
 quay.io/mongodb/mongodb-community-server:8.0.8-ubi9
 quay.io/mongodb/mongodb-kubernetes-operator:0.13.0
