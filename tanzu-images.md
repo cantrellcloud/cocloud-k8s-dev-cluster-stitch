@@ -82,7 +82,7 @@ imgpkg copy -b \
   --cosign-signatures
 
 imgpkg copy -b \
-  projects.registry.vmware.com/tanzu/ca-clusterissuer-bundle:v0.0.2 \
+  projects.registry.vmware.com/vsphere/ca-clusterissuer-bundle:v0.0.2 \
   --to-tar ca-clusterissuer-bundle-v0.0.2.tar \
   --cosign-signatures
 
