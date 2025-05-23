@@ -189,3 +189,14 @@ registry.rocket.chat/rocketchat/rocket.chat:7.0.0
 registry.rocket.chat/rocketchat/rocket.chat:7.2.1
 registry.rocket.chat/rocketchat/rocket.chat:7.5.1
 registry.rocket.chat/rocketchat/rocket.chat:7.6.0
+docker.elastic.co/elasticsearch/elasticsearch:8.18.0
+docker.elastic.co/kibana/kibana:8.18.0
+docker.elastic.co/logstash/logstash:8.18.0
+docker.elastic.co/beats/filebeat:8.18.0
+docker.elastic.co/beats/metricbeat:8.18.0
+docker.elastic.co/beats/heartbeat:8.18.0
+docker.elastic.co/beats/auditbeat:8.18.0
+docker.elastic.co/beats/packetbeat:8.18.0
+docker.elastic.co/beats/journalbeat:7.17.9
+docker.elastic.co/eck/eck-operator:2.8.0
+docker.elastic.co/package-registry/distribution:8.18.1
