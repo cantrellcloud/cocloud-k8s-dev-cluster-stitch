@@ -89,3 +89,166 @@
     * Admin overhead to sync accounts/channels.
     * Potential for data conflict and duplicate content.
     * Less ideal if users expect global presence.
+
+Below are three standalone **Mermaid** diagrams—one for each deployment phase—capturing the key components and data-flows you described.
+You can paste each block into any Mermaid-enabled renderer (e.g., VS Code extension, GitLab, GitHub, MkDocs, etc.) to visualize them.
+
+---
+
+### **Phase 1 – Migrate & Upgrade (VM ➜ TKG)**
+
+```mermaid
+flowchart TD
+    %% Source VM
+    subgraph Legacy_VM["Existing RHEL 8 VM"]
+        direction TB
+        RC_VM[Rocket.Chat 6.x<br>Container]
+        MDB_VM[MongoDB 5.0.23<br>(single RS)]
+    end
+
+    %% Admin workstation
+    AW[TKG Admin Workstation]
+
+    %% Target cluster
+    subgraph TKG_Cluster["TKG Workload Cluster"]
+        direction TB
+        subgraph RS["MongoDB 5.0.23<br>3-node ReplicaSet"]
+            style RS fill:#fdf6e3,stroke:#657b83
+            MDB0[(mongo-0)]
+            MDB1[(mongo-1)]
+            MDB2[(mongo-2)]
+        end
+        RC_STS[Rocket.Chat 6.x<br>Helm Chart]
+    end
+
+    %% Upgrade steps
+    RC_UPG[Upgrade<br>Rocket.Chat → latest]
+    MDB_UPG[Double-hop<br>MongoDB → 6.0 → 7.0]
+
+    %% Flows
+    RC_VM --"mongodump ➜ *.gz"--> AW
+    AW --"kubectl cp"--> MDB0
+    MDB0 --"mongorestore"--> RS
+    RS --> RC_STS
+    RC_STS -.reads/writes .-> RS
+    RC_STS --> RC_UPG --> RC_STS
+    RS --> MDB_UPG --> RS
+
+    %% Legends
+    classDef phase fill:#268bd2,stroke:#002b36,color:#fff
+    class RC_UPG,MDB_UPG phase
+```
+
+---
+
+### **Phase 2 – Globally Stretched Cluster (Active–Active)**
+
+```mermaid
+flowchart TD
+    %% Sites
+    subgraph Site_A["Site A"]
+        direction TB
+        RCa1[RC Pod 1]
+        RCa2[RC Pod 2]
+        MDBa[(Mongo RS Member)]
+        ContourA[Contour&nbsp;/ Envoy]
+    end
+
+    subgraph Site_B["Site B"]
+        direction TB
+        RCb1[RC Pod 1]
+        RCb2[RC Pod 2]
+        MDBb[(Mongo RS Member)]
+        ContourB[Contour&nbsp;/ Envoy]
+    end
+
+    subgraph Site_C["Site C (optional / Arbiter)"]
+        direction TB
+        MDBc[(Mongo RS Member<br>or Arbiter)]
+    end
+
+    %% Replica-set & LB
+    classDef mongo fill:#fdf6e3,stroke:#657b83
+    class MDBa,MDBb,MDBc mongo
+
+    GLB[Global Load Balancer / Geo-DNS]
+
+    %% Flows
+    GLB --"443 / SNI"--> ContourA
+    GLB --"443 / SNI"--> ContourB
+    ContourA --> RCa1 & RCa2
+    ContourB --> RCb1 & RCb2
+    RCa1 & RCa2 & RCb1 & RCb2 --"mongo URI&nbsp;rs0"--> MDBa & MDBb & MDBc
+    MDBa <--►--> MDBb
+    MDBa <--►--> MDBc
+    MDBb <--►--> MDBc
+
+    %% Note
+    note over Site_A,Site_B,Site_C
+      • Writes replicate across sites<br/>
+      • Election latency &lt; 100 ms<br/>
+      • Any site loss ⇒ automatic failover
+    end
+```
+
+---
+
+### **Phase 3 – Per-Site “Island Mode” (Active–Isolated)**
+
+```mermaid
+flowchart LR
+    %% Site A
+    subgraph IsoA["Site A (Cluster A)"]
+        direction TB
+        RCa[Rocket.Chat Pods]
+        MDBA[(Mongo RS)]
+        DNSA[Local DNS]
+        ContourA2[Contour / Envoy]
+    end
+
+    %% Site B
+    subgraph IsoB["Site B (Cluster B)"]
+        direction TB
+        RCb[Rocket.Chat Pods]
+        MDBB[(Mongo RS)]
+        DNSB[Local DNS]
+        ContourB2[Contour / Envoy]
+    end
+
+    %% Optional Site C
+    subgraph IsoC["Site C (Cluster C)"]
+        direction TB
+        RCc[Rocket.Chat Pods]
+        MDBC[(Mongo RS)]
+        DNSC[Local DNS]
+        ContourC2[Contour / Envoy]
+    end
+
+    %% AD / PKI
+    AD[Active Directory / SSO<br>(RODCs per site)]
+    CA[Shared Root CA]
+
+    %% Normal ops
+    ContourA2 --> RCa --> MDBA
+    ContourB2 --> RCb --> MDBB
+    ContourC2 --> RCc --> MDBC
+    DNSA --> ContourA2
+    DNSB --> ContourB2
+    DNSC --> ContourC2
+    AD --> RCa & RCb & RCc
+    CA --> ContourA2 & ContourB2 & ContourC2
+
+    %% Sync after WAN restore
+    classDef sync stroke-dasharray: 5,5
+    RCa ==>|"Federation /\nCustom Sync"| RCb
+    RCb ==>|"Federation /\nCustom Sync"| RCc
+    RCc ==>|"Federation /\nCustom Sync"| RCa
+    class RCa,RCb,RCc sync
+
+    %% Notes
+    note over IsoA,IsoB,IsoC
+      • Each site fully functional offline (RTO ≈ 0)<br/>
+      • Post-isolation sync resolves divergence<br/>
+      • No automatic cross-site failover
+    end
+```
