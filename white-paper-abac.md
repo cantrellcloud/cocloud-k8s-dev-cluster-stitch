@@ -39,6 +39,30 @@ Adopting Zero Trust (ZT) inside an air-gapped Department of Defense (DoD) networ
 
 #### 4 Future-State ABAC Architecture for Zero Trust
 
+```mermaid
+flowchart LR
+  PAP["Policy Admin<br/>Point&nbsp;(PAP)<br/>(XACML / Rego / ALFA)<br/>(e.g., Axiomatics Policy Server)"]
+  Analytics["Visibility & Analytics<br/>(Splunk, ELK, Palantir)"]
+  PDP["Policy Decision Point (PDP)<br/>(OPA-Gatekeeper, NextLabs PBAC)"]
+  AttrAuth["Attribute Authority<br/>(AD LDS, PKI, CMDB)"]
+  DataTag["Data Tagging & Encryption<br/>(Thales, KMIP)"]
+  PEP["Policy Enforcement Point (PEP)<br/>(Cisco ISE, Envoy sidecar, Kong)"]
+
+  PAP -- "Policy verdicts" --> Analytics
+  Analytics -- "Attribute logs / verdicts" --> PAP
+
+  PAP -- "Policy sync (REST/SCAPI)" --> PDP
+
+  PDP -- "Attribute Queries" --> AttrAuth
+  PDP -- "LDAP / SCEP / REST" --> AttrAuth
+
+  PDP -- "Event bus" --> DataTag
+  DataTag -- "Telemetry" --> Analytics
+
+  PDP -- "Permit / deny" --> PEP
+  PEP -- "Inline 802.1X / TLS,<br/>API-Gateway, SDP" --> DataTag
+```
+
 ```
 +-------------------+                                  +------------------+
 |   Policy Admin    |  (XACML / Rego / ALFA)          |  Visibility &    |
