@@ -106,8 +106,6 @@ allow {
 2. **Policy Tune**: Begin with read-only attribute evaluations (log only) to measure impact.
 3. **Expand**: Gate uploads and E2E-encrypted rooms, then roll out to mission-critical users.
 
-If you’d like deep-dive guidance—STIG checklists, Helm overrides for FIPS modules, or a full ABAC policy catalog—just let me know!
-
 [1]: https://www.rocket.chat/blog/blog-out-of-band-communication?utm_source=chatgpt.com "How out of band communication strengthens zero trust security ..."
 [2]: https://www.rocket.chat/?utm_source=chatgpt.com "Rocket.Chat | Secure CommsOS™ for Mission-Critical Operations"
 [3]: https://www.rocket.chat/blog/edge-computing-for-mission-critical-communications?utm_source=chatgpt.com "Benefits of edge computing for mission critical communications in ..."
