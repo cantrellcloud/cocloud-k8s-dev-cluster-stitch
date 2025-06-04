@@ -208,3 +208,15 @@ docker.elastic.co/beats/journalbeat:7.17.9
 docker.elastic.co/beats/journalbeat:8.18.0
 docker.elastic.co/eck/eck-operator:2.8.0
 docker.elastic.co/package-registry/distribution:8.18.1
+quay.io/mongodb/mongodb-kubernetes-operator:1.32.0
+quay.io/mongodb/mongodb-enterprise-database:7.0.20-ent
+quay.io/mongodb/mongodb-agent-ubi:1.32.0
+quay.io/mongodb/mongodb-enterprise-init-database-ubi:1.32.0
+quay.io/mongodb/mongodb-enterprise-init-ops-manager-ubi:1.32.0
+quay.io/mongodb/mongodb-kubernetes-operator-webhook:1.32.0
+quay.io/mongodb/mongodb-kubernetes-operator:1.33.0
+quay.io/mongodb/mongodb-kubernetes-operator-webhook:1.33.0
+quay.io/mongodb/mongodb-agent-ubi:1.33.0
+quay.io/mongodb/mongodb-enterprise-init-database-ubi:1.33.0
+quay.io/mongodb/mongodb-enterprise-init-appdb-ubi:1.33.0
+quay.io/mongodb/mongodb-enterprise-init-ops-manager-ubi:1.33.0
