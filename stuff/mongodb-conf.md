@@ -49,6 +49,97 @@ security:
   authorization: enabled
   keyFile: /opt/bitnami/mongodb/conf/keyfile
 
+---
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-conf
+data:
+  mongodb.conf: |
+    # replica set options
+    replication:
+      replSetName: rsRocketchat
+      enableMajorityReadConcern: true
+
+    # security options
+    security:
+      authorization: enabled
+      keyFile: /opt/bitnami/mongodb/conf/keyfile
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  labels:
+    app: bitnami-mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bitnami-mongodb
+  template:
+    metadata:
+      labels:
+        app: bitnami-mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: bitnami/mongodb:latest
+          # other env/ports/args as needed...
+          volumeMounts:
+            - name: mongodb-config
+              mountPath: /opt/bitnami/mongodb/conf/mongodb.conf
+              subPath: mongodb.conf
+      volumes:
+        - name: mongodb-config
+          configMap:
+            name: mongodb-conf
+```
+
+---
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-keyfile-secret
+type: Opaque
+stringData:
+  keyfile: |
+    hPV0d4T1VrVmFjMWRVU2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  labels:
+    app: bitnami-mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bitnami-mongodb
+  template:
+    metadata:
+      labels:
+        app: bitnami-mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: bitnami/mongodb:latest
+          # ... (other env/ports/args as needed) ...
+          volumeMounts:
+            - name: mongodb-keyfile
+              mountPath: /opt/bitnami/mongodb/conf/keyfile
+              subPath: keyfile
+      volumes:
+        - name: mongodb-keyfile
+          secret:
+            secretName: mongodb-keyfile-secret
+```
+
 
 
 
