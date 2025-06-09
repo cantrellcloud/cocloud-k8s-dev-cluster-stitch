@@ -52,6 +52,11 @@ Verify the local copy of the binary package tkg-service-v3.1.0.tar.
 ## Pull packages from VMware
 
 imgpkg copy -b \
+  projects.packages.broadcom.com/vsphere/iaas/tkg-service/3.3.2/tkg-service:3.3.3 \
+  --to-tar tkg-service-3.3.3.tar \
+  --cosign-signatures
+
+imgpkg copy -b \
   projects.packages.broadcom.com/vsphere/iaas/tkg-service/3.3.2/tkg-service:3.3.2 \
   --to-tar tkg-service-3.3.2.tar \
   --cosign-signatures
@@ -97,6 +102,14 @@ imgpkg copy -b \
   --cosign-signatures
 
 # Push packages to registry
+
+imgpkg copy \
+  --tar tkg-service-3.3.3.tar \
+  --to-repo kuberegistry.dev.kube/tkgs/tkg-service \
+  --cosign-signatures \
+  --registry-username admin \
+  --registry-password 'ZAQwsx!@#123' \
+  --registry-ca-cert-path kuberegistry-chain.crt
 
 imgpkg copy \
   --tar tkg-service-3.2.0.tar \
