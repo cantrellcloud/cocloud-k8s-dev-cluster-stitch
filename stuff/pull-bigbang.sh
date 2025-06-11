@@ -3,7 +3,7 @@ clear
 echo START
 echo
 echo Pulling images...
-for image in `cat /home/adminlocal/altregistry/${1}`; do echo pulling image: $image; nerdctl pull $image -u cantrellr -p repo1-dso-mil1MDp98mtyyd1PEENzjdR; done
+for image in `cat /home/adminlocal/altregistry/${1}`; do echo pulling image: $image; nerdctl pull $image -u cantrellr -p k7mqmev1O2t67EuVkHFvmJ7RUAihYbad; done
 echo
 echo ---
 echo
