@@ -220,3 +220,11 @@ quay.io/mongodb/mongodb-agent-ubi:1.33.0
 quay.io/mongodb/mongodb-enterprise-init-database-ubi:1.33.0
 quay.io/mongodb/mongodb-enterprise-init-appdb-ubi:1.33.0
 quay.io/mongodb/mongodb-enterprise-init-ops-manager-ubi:1.33.0
+quay.io/mongodb/mongodb-enterprise-operator-ubi:1.33.0
+quay.io/mongodb/mongodb-agent-ubi:13.34.0.9465-1
+quay.io/mongodb/mongodb-enterprise-database-ubi:1.33.0
+quay.io/mongodb/mongodb-enterprise-init-database-ubi:1.33.0
+quay.io/mongodb/mongodb-enterprise-init-appdb-ubi:1.33.0
+quay.io/mongodb/mongodb-enterprise-appdb:10.2.15.5958-1_4.2.11
+quay.io/mongodb/mongodb-enterprise-ops-manager-ubi:7.0.15
+quay.io/mongodb/mongodb-enterprise-init-ops-manager-ubi:1.33.0
